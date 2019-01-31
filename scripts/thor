@@ -1,0 +1,4 @@
+#/bin/bash
+# wrapper around thor to be placed in /usr/local/bin
+
+cd practicalbft/thor && source env/bin/activate && python3.5 thor.py $@
