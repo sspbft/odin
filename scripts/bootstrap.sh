@@ -27,6 +27,9 @@ sudo make altinstall
 sudo ln -s /usr/local/bin/python3.7 /bin/python3.7
 log "Python 3.7.2 available as python3.7 in /bin"
 
+# log "Installing rsyslog"
+# sudo yum -y install rsyslog
+
 log "Installing git"
 sudo yum install git -y
 
