@@ -18,7 +18,7 @@ def get_node_ids_for_slice(slice_name, count):
 
 
 def get_nodes_for_slice(slice_name, count):
-    logger.info(f"Querying PL API for nodes on slice {slice_name}")
+    logger.info(f"Fetching nodes attachhed to {slice_name}")
     node_ids = get_node_ids_for_slice(slice_name, count)
     if len(node_ids) < count:
         raise ValueError(f"Only {len(node_ids)} nodes attached to slice" +
@@ -34,6 +34,7 @@ def get_nodes_for_slice(slice_name, count):
 
     if len(nodes) > count:
         nodes = nodes[:count]
+    logger.info(f"Found {count} healthy nodes for slice {slice_name}")
     return nodes
 
 

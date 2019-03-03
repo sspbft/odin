@@ -1,5 +1,5 @@
 from conf import conf
-from orchestrator.deployment import deploy_as_byz_node, deploy_as_normal_node
+from orchestrator.deployment import deploy
 import api.pl as api
 import logging
 
@@ -22,11 +22,15 @@ def launch():
     regular_nodes = nodes[byz_count:]
     byz_nodes = nodes[:byz_count]
 
-    for n in regular_nodes:
-        deploy_as_normal_node(n)
+    # hosts_file_path = generate
 
-    for n in byz_nodes:
-        deploy_as_byz_node
+    deploy(regular_nodes, byz_nodes)
+
+    # for n in regular_nodes:
+    #     deploy_as_normal_node(n)
+
+    # for n in byz_nodes:
+    #     deploy_as_byz_node(n)
 
 
 if __name__ == "__main__":
