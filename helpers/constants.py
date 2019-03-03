@@ -12,6 +12,8 @@ NUMBER_OF_BYZ = "number_of_byzantine"
 APP_SECTION = "application"
 GIT_URL = "git_url"
 BOOTSTRAP_SCRIPT = "bootstrap_script"
+TARGET_DIR = "target_dir"
+APP_FOLDER = "app_folder"
 
 # PlanetLab API
 NODE_HEALTHY = "boot"

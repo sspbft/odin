@@ -54,3 +54,13 @@ def get_application_git_url():
 def get_bootstrap_script():
     """Returns the configured path of the bootstrap script for the app."""
     return get(cs.ODIN_CONF, cs.APP_SECTION, cs.BOOTSTRAP_SCRIPT)
+
+
+def get_target_dir():
+    """Returns the configured target dir for the app on a PLanetLab node."""
+    return get(cs.ODIN_CONF, cs.APP_SECTION, cs.TARGET_DIR)
+
+
+def get_app_folder():
+    """Returns the configured folder for the app on a PLanetLab node."""
+    return get(cs.ODIN_CONF, cs.APP_SECTION, cs.APP_FOLDER)

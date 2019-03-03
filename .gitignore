@@ -4,3 +4,4 @@ env
 connect
 auth.ini
 __pycache__ 
+hosts.txt

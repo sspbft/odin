@@ -2,6 +2,7 @@ from api.auth import get_auth
 from helpers.constants import NODE_HEALTHY
 import xmlrpc.client as xc
 import logging
+import os
 
 api_server = xc.ServerProxy("https://www.planet-lab.eu/PLCAPI/")
 auth = get_auth()
@@ -48,4 +49,10 @@ def get_node_details(node_id):
 
 
 def is_node_healthy(node_details):
-    return node_details["boot_state"] == NODE_HEALTHY
+    return (node_details["boot_state"] == NODE_HEALTHY and
+            responding_to_ping(node_details["hostname"]))
+
+
+def responding_to_ping(hostname):
+    """Pings the specified hostname and returns if ping was successful."""
+    return os.system(f"ping -c 1 {hostname}") == 0
