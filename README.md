@@ -1,5 +1,7 @@
 # Odin
 Orchestrator service used to manage nodes and deployment of code on PlanetLab. Named after the god of gods, Odin.
+[![Build status](https://travis-ci.org/practicalbft/odin.svg?branch=master)](https://travis-ci.org/travis-ci/travis-web)
+
 
 ## About Odin
 ## Set up
@@ -13,3 +15,5 @@ mv conf/auth.example.ini conf/auth.ini  # edit with appropriate details
 ```
 
 Modify `conf/odin.ini` to contain the appropriate configuration values.
+
+Then, it is as easy as running `python odin.py` and watching the magic happen!

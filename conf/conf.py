@@ -25,6 +25,7 @@ def get_pl_password():
     """Returns the configured PlanetLab password."""
     return get(cs.AUTH_CONF, cs.AUTH_SECTION, cs.PL_PASSWORD)
 
+
 def get_ssh_key_path():
     """Returns the configured absolute path to the SSH key to use."""
     return get(cs.AUTH_CONF, cs.AUTH_SECTION, cs.SSH_KEY_ABS_PATH)
@@ -48,6 +49,7 @@ def get_number_of_byzantine():
 def get_application_git_url():
     """Returns the configured git url for the application to deploy."""
     return get(cs.ODIN_CONF, cs.APP_SECTION, cs.GIT_URL)
+
 
 def get_bootstrap_script():
     """Returns the configured path of the bootstrap script for the app."""

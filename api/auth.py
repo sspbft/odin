@@ -1,5 +1,4 @@
 from conf import conf
-from helpers.constants import (PL_USERNAME, PL_PASSWORD)
 
 
 def get_auth():
