@@ -1,8 +1,10 @@
 from api.auth import get_auth
-from helpers.constants import NODE_HEALTHY
+from helpers.constants import NODE_HEALTHY, NODE_CMD_THRESHOLD
 import xmlrpc.client as xc
 import logging
+import time
 import os
+import orchestrator.connector as conn
 
 api_server = xc.ServerProxy("https://www.planet-lab.eu/PLCAPI/")
 auth = get_auth()
@@ -30,8 +32,8 @@ def get_nodes_for_slice(slice_name, count):
         if is_node_healthy(details):
             nodes.append(details)
         else:
-            logger.info(f"Found non-healthy node {details['hostname']}" +
-                        f" with id {n_id}")
+            logger.warning(f"Found non-healthy node {details['hostname']}" +
+                           f" with id {n_id}")
 
     if len(nodes) > count:
         nodes = nodes[:count]
@@ -49,8 +51,35 @@ def get_node_details(node_id):
 
 
 def is_node_healthy(node_details):
-    return (node_details["boot_state"] == NODE_HEALTHY and
-            responding_to_ping(node_details["hostname"]))
+    """Health check for a PlanetLab node."""
+    if not node_details["boot_state"] == NODE_HEALTHY:
+        return False
+    if not is_online(node_details["hostname"]):
+        return False
+    if not node_responds_within_threshold(node_details["hostname"]):
+        return False
+    if not responding_to_ping(node_details["hostname"]):
+        return False
+
+    return True
+
+
+def node_responds_within_threshold(hostname):
+    """Checks if the node can run a simple command within threshold s."""
+    start_time = time.time()
+    conn.run_command(hostname, "ls /")
+    responding_within_threshold = time.time() - start_time < NODE_CMD_THRESHOLD
+    if not responding_within_threshold:
+        logger.warning(f"{hostname} is not responding within threshold")
+    return responding_within_threshold
+
+
+def is_online(hostname):
+    """Checks if the host with hostname can access Internet."""
+    is_online = conn.run_command(hostname, "curl -m 5http://google.com") == 0
+    if not is_online:
+        logger.warning(f"{hostname} can not access Internet")
+    return is_online
 
 
 def responding_to_ping(hostname):

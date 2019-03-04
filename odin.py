@@ -22,15 +22,7 @@ def launch():
     regular_nodes = nodes[byz_count:]
     byz_nodes = nodes[:byz_count]
 
-    # hosts_file_path = generate
-
     deploy(regular_nodes, byz_nodes)
-
-    # for n in regular_nodes:
-    #     deploy_as_normal_node(n)
-
-    # for n in byz_nodes:
-    #     deploy_as_byz_node(n)
 
 
 if __name__ == "__main__":

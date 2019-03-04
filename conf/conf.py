@@ -64,3 +64,13 @@ def get_target_dir():
 def get_app_folder():
     """Returns the configured folder for the app on a PLanetLab node."""
     return get(cs.ODIN_CONF, cs.APP_SECTION, cs.APP_FOLDER)
+
+
+def get_abs_path_to_app():
+    """Returns the absolute path to the application root folder."""
+    return f"{get_target_dir()}/{get_app_folder()}"
+
+
+def get_app_entrypoint():
+    """Returns the entrypoint command that starts the app."""
+    return get(cs.ODIN_CONF, cs.APP_SECTION, cs.ENTRYPOINT)

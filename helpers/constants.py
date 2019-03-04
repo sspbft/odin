@@ -14,6 +14,8 @@ GIT_URL = "git_url"
 BOOTSTRAP_SCRIPT = "bootstrap_script"
 TARGET_DIR = "target_dir"
 APP_FOLDER = "app_folder"
+ENTRYPOINT = "entrypoint"
 
 # PlanetLab API
 NODE_HEALTHY = "boot"
+NODE_CMD_THRESHOLD = 5

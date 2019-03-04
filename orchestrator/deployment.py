@@ -1,6 +1,8 @@
 from conf import conf
 from helpers import io
+from threading import Thread
 import logging
+import socket
 import orchestrator.connector as conn
 
 logger = logging.getLogger(__name__)
@@ -10,25 +12,37 @@ SLICE = conf.get_slice()
 def generate_hosts_file(nodes):
     with open("hosts.txt", "w") as f:
         for i, n in enumerate(nodes):
-            f.write(f"{i},{n['hostname']},1.3.3.7,{5000+i}\n")
+            ip = socket.gethostbyname(n["hostname"])
+            f.write(f"{i},{n['hostname']},{ip},{5000+i}\n")
 
 
 def deploy(regular_nodes, byz_nodes):
     generate_hosts_file(regular_nodes + byz_nodes)
 
-    # NOTE that this is just temporary, to avoid faulty deployments on n nodes
-    deploy_node(regular_nodes[1])
+    threads = []
+    i = 0
+    for n in regular_nodes:
+        threads.append(Thread(target=deploy_and_run, args=(n, i)))
+        i += 1
+    for n in byz_nodes:
+        threads.append(Thread(target=deploy_and_run, args=(n, i)))
+        i += 1
 
-    # for n in regular_nodes:
-    #     deploy_node(n)
-    # for n in byz_nodes:
-    #     deploy_node(n)
+    for t in threads:
+        t.start()
+
+
+def deploy_and_run(node, node_id):
+    deploy_node(node)
+    launch_using_thor(node["hostname"], node_id)
 
 
 def deploy_node(node):
     logger.info(f"Deploying BFTList to node {node['hostname']}")
     target_dir = conf.get_target_dir()
     hostname = node["hostname"]
+
+    conn.run_command(hostname, f"pkill -u {conf.get_slice()}")
 
     # provision node
     conn.transfer_files(
@@ -62,3 +76,14 @@ def deploy_node(node):
 
     # cleanup
     conn.run_command(hostname, f"rm ~/bootstrap_node.sh")
+
+
+def launch_using_thor(hostname, i):
+    thor_dir = f"{conf.get_target_dir()}/thor"
+    n = conf.get_number_of_nodes()
+    f = conf.get_number_of_byzantine()
+    p = conf.get_abs_path_to_app()
+    e = conf.get_app_entrypoint()
+    cmd_string = (f"cd {thor_dir} && source ./env/bin/activate && python " +
+                  f"thor.py -n {n} -f {f} -p {p} -e '{e}' -i {i} planetlab &")
+    conn.run_command(hostname, cmd_string)

@@ -27,3 +27,4 @@ def run_command(hostname, cmd):
     output, error = process.communicate()
     if error is not None:
         logger.error(f"Error when running {cmd} on {hostname}")
+    return process.returncode
