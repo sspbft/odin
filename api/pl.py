@@ -21,7 +21,7 @@ def get_node_ids_for_slice(slice_name, count):
 
 
 def get_nodes_for_slice(slice_name, count):
-    logger.info(f"Fetching nodes attachhed to {slice_name}")
+    logger.info(f"Fetching nodes attached to {slice_name}")
     node_ids = get_node_ids_for_slice(slice_name, count)
     if len(node_ids) < count:
         raise ValueError(f"Only {len(node_ids)} nodes attached to slice" +
@@ -76,7 +76,7 @@ def node_responds_within_threshold(hostname):
 
 def is_online(hostname):
     """Checks if the host with hostname can access Internet."""
-    is_online = conn.run_command(hostname, "curl -m 5http://google.com") == 0
+    is_online = conn.run_command(hostname, "curl -m 5 http://google.com") == 0
     if not is_online:
         logger.warning(f"{hostname} can not access Internet")
     return is_online

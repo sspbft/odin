@@ -30,11 +30,16 @@ def deploy(regular_nodes, byz_nodes):
 
     for t in threads:
         t.start()
+    for t in threads:
+        t.join()
+
+    logger.info("Application deployed and running!")
 
 
 def deploy_and_run(node, node_id):
     deploy_node(node)
     launch_using_thor(node["hostname"], node_id)
+    return
 
 
 def deploy_node(node):
@@ -75,7 +80,7 @@ def deploy_node(node):
     logger.info(f"{app_folder} setup on {hostname}")
 
     # cleanup
-    conn.run_command(hostname, f"rm ~/bootstrap_node.sh")
+    return conn.run_command(hostname, f"rm ~/bootstrap_node.sh")
 
 
 def launch_using_thor(hostname, i):
@@ -86,4 +91,4 @@ def launch_using_thor(hostname, i):
     e = conf.get_app_entrypoint()
     cmd_string = (f"cd {thor_dir} && source ./env/bin/activate && python " +
                   f"thor.py -n {n} -f {f} -p {p} -e '{e}' -i {i} planetlab &")
-    conn.run_command(hostname, cmd_string)
+    return conn.run_command(hostname, cmd_string)

@@ -12,6 +12,7 @@ source ./env/bin/activate
 pip install --upgrade pip
 pip install -r requirements.txt
 mv conf/auth.example.ini conf/auth.ini  # edit with appropriate details
+chmod +x scripts/*
 ```
 
 Modify `conf/odin.ini` to contain the appropriate configuration values.
