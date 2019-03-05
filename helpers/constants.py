@@ -17,6 +17,7 @@ APP_FOLDER = "app_folder"
 ENTRYPOINT = "entrypoint"
 ETC_SECTION = "etc"
 HEIMDALL_SD_PATH = "heimdall_sd_path"
+HEIMDALL_ROOT = "heimdall_root"
 
 # PlanetLab API
 NODE_HEALTHY = "boot"

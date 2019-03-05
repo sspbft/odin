@@ -4,9 +4,12 @@ from orchestrator.connector import run_command
 import api.pl as api
 import logging
 import sys
+import subprocess
 import json
 import signal
 import helpers.io as io
+import helpers.ps as ps
+from shutil import which
 
 logger = logging.getLogger(__name__)
 
@@ -59,7 +62,30 @@ def cleanup():
 def on_sig_term(signal, frame):
     logger.info("Quitting and killing all processes on PL nodes")
     cleanup()
+    ps.kill_all_subprocesses()
     sys.exit(0)
+
+
+def setup_heimdall(debug=False):
+    """
+    Starts the Heimdall service.
+
+    Given that docker-compose is available and path to Heimdall project root
+    is specified, this methods starts heimdall as a subprocess.
+    """
+    heimdall_root = conf.get_heimdall_root()
+    if heimdall_root is not None:
+        logger.info("Launching Heimdall")
+        dc = "docker-compose"
+        if which(dc) is None:
+            raise EnvironmentError("Can't find docker-compose binary.")
+        p = subprocess.Popen(f"{dc} down && {dc} up", shell=True,
+                             cwd=heimdall_root)
+        ps.add_subprocess_pid(p.pid)
+        logger.info(f"Starting Heimdall with PID {p.pid}")
+        logger.info("Grafana can be found on http://localhost:3000")
+    else:
+        logger.info("Heimdall not configured, skipping")
 
 
 if __name__ == "__main__":
@@ -69,4 +95,7 @@ if __name__ == "__main__":
         cleanup()
     else:
         setup_logging()
-        launch()
+        setup_heimdall()
+        while True:
+            pass
+        # launch()

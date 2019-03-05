@@ -77,4 +77,10 @@ def get_app_entrypoint():
 
 
 def get_heimdall_sd_path():
+    """Returns the absolute path to the Heimdall SD file."""
     return get(cs.ODIN_CONF, cs.ETC_SECTION, cs.HEIMDALL_SD_PATH)
+
+
+def get_heimdall_root():
+    """Returns the absolute path to the Heimdall project root."""
+    return get(cs.ODIN_CONF, cs.ETC_SECTION, cs.HEIMDALL_ROOT)
