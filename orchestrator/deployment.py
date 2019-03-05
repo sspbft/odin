@@ -1,6 +1,6 @@
 from conf import conf
 from helpers import io
-from threading import Thread
+from threading import Thread, Event
 import logging
 import socket
 import orchestrator.connector as conn
@@ -34,6 +34,16 @@ def deploy(regular_nodes, byz_nodes):
         t.join()
 
     logger.info("Application deployed and running!")
+
+    i = 0
+    for n in regular_nodes:
+        logger.info(f"Node {i} running on {n['hostname']}")
+        i += 1
+    for n in byz_nodes:
+        logger.info(f"Byzanting node {i} running on {n['hostname']}")
+        i += 1
+    forever = Event()
+    forever.wait()
 
 
 def deploy_and_run(node, node_id):
@@ -89,6 +99,8 @@ def launch_using_thor(hostname, i):
     f = conf.get_number_of_byzantine()
     p = conf.get_abs_path_to_app()
     e = conf.get_app_entrypoint()
+    lp = f"{conf.get_target_dir()}/application.log"
     cmd_string = (f"cd {thor_dir} && source ./env/bin/activate && python " +
-                  f"thor.py -n {n} -f {f} -p {p} -e '{e}' -i {i} planetlab &")
+                  f"thor.py -n {n} -f {f} -p {p} -e '{e}' -i {i} -lp {lp} " +
+                  f"planetlab &")
     return conn.run_command(hostname, cmd_string)

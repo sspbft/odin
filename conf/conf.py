@@ -74,3 +74,7 @@ def get_abs_path_to_app():
 def get_app_entrypoint():
     """Returns the entrypoint command that starts the app."""
     return get(cs.ODIN_CONF, cs.APP_SECTION, cs.ENTRYPOINT)
+
+
+def get_heimdall_sd_path():
+    return get(cs.ODIN_CONF, cs.ETC_SECTION, cs.HEIMDALL_SD_PATH)

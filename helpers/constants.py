@@ -15,6 +15,8 @@ BOOTSTRAP_SCRIPT = "bootstrap_script"
 TARGET_DIR = "target_dir"
 APP_FOLDER = "app_folder"
 ENTRYPOINT = "entrypoint"
+ETC_SECTION = "etc"
+HEIMDALL_SD_PATH = "heimdall_sd_path"
 
 # PlanetLab API
 NODE_HEALTHY = "boot"

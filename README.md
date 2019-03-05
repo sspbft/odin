@@ -12,9 +12,19 @@ source ./env/bin/activate
 pip install --upgrade pip
 pip install -r requirements.txt
 mv conf/auth.example.ini conf/auth.ini  # edit with appropriate details
-chmod +x scripts/*
+chmod +x scripts/* client/start
 ```
 
 Modify `conf/odin.ini` to contain the appropriate configuration values.
 
 Then, it is as easy as running `python odin.py` and watching the magic happen!
+
+## Deploying an application to PlanetLab
+`// TODO`
+
+## Using the bundled client for BFTList
+First, make sure that a deployment has been done and the nodes are running. Then run
+```
+cd client && ./start
+```
+and start sending requests using the client shell!

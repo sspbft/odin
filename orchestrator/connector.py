@@ -19,12 +19,16 @@ def transfer_files(hostname, files, target_dir):
             logger.error(f"Error when copying {f} to {hostname}: {error}")
 
 
-def run_command(hostname, cmd):
+def run_command(hostname, cmd, timeout=None):
     logger.info(f"Running command {cmd} on {hostname}")
     cmd_string = (f"ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=" +
                   f"/dev/null -l {SLICE} -i {SSH_KEY_PATH} {hostname} {cmd}")
     process = subprocess.Popen(cmd_string.split(), stdout=subprocess.PIPE)
-    output, error = process.communicate()
-    if error is not None:
-        logger.error(f"Error when running {cmd} on {hostname}")
-    return process.returncode
+    try:
+        output, error = process.communicate(timeout=timeout)
+        if error is not None:
+            logger.error(f"Error when running {cmd} on {hostname}")
+        return process.returncode
+    except subprocess.TimeoutExpired:
+        logger.warning(f"Cmd {cmd} on {hostname} timed out")
+        return 1

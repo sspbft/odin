@@ -53,3 +53,13 @@ pip install --upgrade pip
 pip install -r requirements.txt
 deactivate
 log "Thor installed and bootstrapped"
+
+log "Fetching remote_syslog2"
+cd /practicalbft
+touch application.log
+chmod 777 application.log
+wget https://github.com/papertrail/remote_syslog2/releases/download/v0.20/remote_syslog_linux_amd64.tar.gz -O remote_syslog2.tar.gz
+tar -xvf remote_syslog2.tar.gz
+cd remote_syslog
+sudo ./remote_syslog -p 39112 -d logs6.papertrailapp.com --pid-file=/var/run/remote_syslog.pid /practicalbft/application.log
+log "remote_syslog2 configured and launched"
