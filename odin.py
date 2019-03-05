@@ -98,4 +98,4 @@ if __name__ == "__main__":
         setup_heimdall()
         while True:
             pass
-        # launch()
+        launch()
