@@ -79,7 +79,7 @@ def setup_heimdall(debug=False):
         dc = "docker-compose"
         if which(dc) is None:
             raise EnvironmentError("Can't find docker-compose binary.")
-        p = subprocess.Popen(f"{dc} down && {dc} up", shell=True,
+        p = subprocess.Popen(f"{dc} down && {dc} up > /dev/null", shell=True,
                              cwd=heimdall_root)
         ps.add_subprocess_pid(p.pid)
         logger.info(f"Starting Heimdall with PID {p.pid}")
@@ -96,6 +96,4 @@ if __name__ == "__main__":
     else:
         setup_logging()
         setup_heimdall()
-        while True:
-            pass
         launch()

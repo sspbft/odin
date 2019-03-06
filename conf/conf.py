@@ -51,6 +51,11 @@ def get_application_git_url():
     return get(cs.ODIN_CONF, cs.APP_SECTION, cs.GIT_URL)
 
 
+def get_application_git_branch():
+    """Returns the configured git branch for the application to deploy."""
+    return get(cs.ODIN_CONF, cs.APP_SECTION, cs.GIT_BRANCH)
+
+
 def get_bootstrap_script():
     """Returns the configured path of the bootstrap script for the app."""
     return get(cs.ODIN_CONF, cs.APP_SECTION, cs.BOOTSTRAP_SCRIPT)
@@ -74,6 +79,16 @@ def get_abs_path_to_app():
 def get_app_entrypoint():
     """Returns the entrypoint command that starts the app."""
     return get(cs.ODIN_CONF, cs.APP_SECTION, cs.ENTRYPOINT)
+
+
+def get_app_run_sleep():
+    """Returns the entrypoint command that starts the app."""
+    return get(cs.ODIN_CONF, cs.APP_SECTION, cs.RUN_SLEEP)
+
+
+def get_blacklisted_hosts():
+    """Returns a list of the blacklisted hostnames."""
+    return get(cs.ODIN_CONF, cs.PL_SECTION, cs.BLACKLISTED_HOSTS).split(",")
 
 
 def get_heimdall_sd_path():

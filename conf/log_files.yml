@@ -1,0 +1,8 @@
+files: 
+  - /practicalbft/application.log
+  - ~/bootstrap.log
+destination:
+  host: logs6.papertrailapp.com
+  port: 39112
+  protocol: tls
+pid_file: /var/run/remote_syslog.pid

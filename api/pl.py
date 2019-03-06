@@ -1,4 +1,5 @@
 from api.auth import get_auth
+from conf import conf
 from helpers.constants import NODE_HEALTHY, NODE_CMD_THRESHOLD
 import xmlrpc.client as xc
 import logging
@@ -27,13 +28,21 @@ def get_nodes_for_slice(slice_name, count):
         raise ValueError(f"Only {len(node_ids)} nodes attached to slice" +
                          f"{slice_name}. {count} was requested.")
     nodes = []
+    blacklisted_nodes = conf.get_blacklisted_hosts()
+
     for n_id in node_ids:
         details = get_node_details(n_id)
+        hostname = details["hostname"]
+
+        if hostname in blacklisted_nodes:
+            logger.warning(f"Found blacklisted node {hostname}, skipping")
+            continue
+
         if is_node_healthy(details):
             nodes.append(details)
         else:
-            logger.warning(f"Found non-healthy node {details['hostname']}" +
-                           f" with id {n_id}")
+            logger.warning(f"Found non-healthy node {hostname}" +
+                           f" with id {n_id}, skipping")
 
     if len(nodes) > count:
         nodes = nodes[:count]
@@ -75,14 +84,14 @@ def node_responds_within_threshold(hostname):
 
 
 def is_online(hostname):
-    """Checks if the host with hostname can access Internet."""
+    """Checks if the host with hostname can access Internet 'fast'."""
     is_online = conn.run_command(
         hostname,
         "curl -m 5 http://google.com",
         timeout=10
     ) == 0
     if not is_online:
-        logger.warning(f"{hostname} can not access Internet")
+        logger.warning(f"{hostname} is considered to be offline")
     return is_online
 
 

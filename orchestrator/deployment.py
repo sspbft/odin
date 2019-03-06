@@ -36,11 +36,11 @@ def deploy(regular_nodes, byz_nodes):
     logger.info("Application deployed and running!")
 
     i = 0
-    for n in regular_nodes:
+    for n in byz_nodes:
         logger.info(f"Node {i} running on {n['hostname']}")
         i += 1
-    for n in byz_nodes:
-        logger.info(f"Byzanting node {i} running on {n['hostname']}")
+    for n in regular_nodes:
+        logger.info(f"Byzantine node {i} running on {n['hostname']}")
         i += 1
     forever = Event()
     forever.wait()
@@ -62,30 +62,39 @@ def deploy_node(node):
     # provision node
     conn.transfer_files(
         hostname,
-        [io.get_abs_path("scripts/bootstrap_node.sh")],
+        [
+            io.get_abs_path("conf/log_files.yml"),
+            io.get_abs_path("scripts/bootstrap_node.sh")
+        ],
         "~"
     )
     conn.run_command(
         hostname,
-        "cd ~ && chmod +x bootstrap_node.sh && sh bootstrap_node.sh"
+        f"cd ~ && chmod +x bootstrap_node.sh && sh bootstrap_node.sh" +
+        f" > ~/bootstrap.log"
     )
     logger.info(f"Node {hostname} provisioned")
 
     # transfer app files and set up app
     conn.transfer_files(
         hostname,
-        [io.get_abs_path("hosts.txt"),
-         io.get_abs_path(conf.get_bootstrap_script())
-         ],
+        [
+            io.get_abs_path("hosts.txt"),
+            io.get_abs_path(conf.get_bootstrap_script())
+        ],
         target_dir
     )
 
     git_url = conf.get_application_git_url()
+    git_branch = conf.get_application_git_branch()
     app_folder = conf.get_app_folder()
     app_dir = f"{target_dir}/{app_folder}"
-    conn.run_command(hostname, f"cd {target_dir} && git clone {git_url}")
+    conn.run_command(hostname, f"cd {target_dir} && git clone {git_url}" +
+                               f" && cd {app_folder} && git checkout " +
+                               f"{git_branch} && git pull")
     conn.run_command(hostname, f"mv {target_dir}/bootstrap_app.sh {app_dir}")
-    conn.run_command(hostname, f"cd {app_dir} && sh bootstrap_app.sh")
+    conn.run_command(hostname, f"cd {app_dir} && sh bootstrap_app.sh" +
+                               f" > ~/bootstrap.log")
 
     logger.info(f"{app_folder} setup on {hostname}")
 
@@ -100,7 +109,8 @@ def launch_using_thor(hostname, i):
     p = conf.get_abs_path_to_app()
     e = conf.get_app_entrypoint()
     lp = f"{conf.get_target_dir()}/application.log"
-    cmd_string = (f"cd {thor_dir} && source ./env/bin/activate && python " +
-                  f"thor.py -n {n} -f {f} -p {p} -e '{e}' -i {i} -lp {lp} " +
-                  f"planetlab &")
+    rs = conf.get_app_run_sleep()
+    cmd_string = (f"cd {thor_dir} && source ./env/bin/activate && " +
+                  f"python thor.py -n {n} -f {f} -p {p} -e '{e}' -i {i} " +
+                  f"-lp {lp} -rs {rs} planetlab &")
     return conn.run_command(hostname, cmd_string)
