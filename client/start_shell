@@ -1,0 +1,1 @@
+HOSTS_PATH=/Users/axelniklasson/dev/practicalbft/BFTList/conf/hosts.txt python3.7 shell.py

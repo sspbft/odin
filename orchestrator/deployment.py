@@ -16,32 +16,36 @@ def generate_hosts_file(nodes):
             f.write(f"{i},{n['hostname']},{ip},{5000+i}\n")
 
 
-def deploy(regular_nodes, byz_nodes):
-    generate_hosts_file(regular_nodes + byz_nodes)
+def deploy(byz_nodes, regular_nodes):
+    generate_hosts_file(byz_nodes + regular_nodes)
 
     threads = []
     i = 0
-    for n in regular_nodes:
-        threads.append(Thread(target=deploy_and_run, args=(n, i)))
-        i += 1
-    for n in byz_nodes:
-        threads.append(Thread(target=deploy_and_run, args=(n, i)))
-        i += 1
-
-    for t in threads:
+    for n in byz_nodes + regular_nodes:
+        t = Thread(target=deploy_and_run, args=(n, i))
         t.start()
+        threads.append(t)
+        i += 1
+    # for n in byz_nodes:
+    #     threads.append(Thread(target=deploy_and_run, args=(n, i)))
+    #     i += 1
+
+    # for t in threads:
+    #     t.start()
     for t in threads:
         t.join()
 
     logger.info("Application deployed and running!")
 
     i = 0
-    for n in byz_nodes:
+    for n in byz_nodes + regular_nodes:
         logger.info(f"Node {i} running on {n['hostname']}")
         i += 1
-    for n in regular_nodes:
-        logger.info(f"Byzantine node {i} running on {n['hostname']}")
-        i += 1
+    # for n in regular_nodes:
+    #     logger.info(f"Byzantine node {i} running on {n['hostname']}")
+    #     i += 1
+
+    # wait
     forever = Event()
     forever.wait()
 
@@ -111,6 +115,6 @@ def launch_using_thor(hostname, i):
     lp = f"{conf.get_target_dir()}/application.log"
     rs = conf.get_app_run_sleep()
     cmd_string = (f"cd {thor_dir} && source ./env/bin/activate && " +
-                  f"python thor.py -n {n} -f {f} -p {p} -e '{e}' -i {i} " +
-                  f"-lp {lp} -rs {rs} planetlab &")
+                  f"python thor.py -n {n} -f {f} -p {p} -e '{e}' " +
+                  f"-i {i} -lp {lp} -rs {rs} planetlab &")
     return conn.run_command(hostname, cmd_string)

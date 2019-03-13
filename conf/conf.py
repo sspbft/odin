@@ -31,11 +31,6 @@ def get_ssh_key_path():
     return get(cs.AUTH_CONF, cs.AUTH_SECTION, cs.SSH_KEY_ABS_PATH)
 
 
-def get_slice():
-    """Returns the configured slice."""
-    return get(cs.ODIN_CONF, cs.MAIN_SECTION, cs.SLICE)
-
-
 def get_number_of_nodes():
     """Returns the configured number of nodes."""
     return int(get(cs.ODIN_CONF, cs.MAIN_SECTION, cs.NUMBER_OF_NODES))
@@ -84,6 +79,31 @@ def get_app_entrypoint():
 def get_app_run_sleep():
     """Returns the entrypoint command that starts the app."""
     return get(cs.ODIN_CONF, cs.APP_SECTION, cs.RUN_SLEEP)
+
+
+def get_client_src():
+    """Return the folder containing the client code."""
+    return get(cs.ODIN_CONF, cs.CLIENT_SECTION, cs.CLIENT_SRC)
+
+
+def get_client_entrypoint():
+    """Return the configured entrypoint script for a client process."""
+    return get(cs.ODIN_CONF, cs.CLIENT_SECTION, cs.CLIENT_ENTRYPOINT)
+
+
+def get_nbr_of_clients():
+    """Return the configured number of clients that should be started."""
+    return get(cs.ODIN_CONF, cs.CLIENT_SECTION, cs.NBR_OF_CLIENTS)
+
+
+def get_reqs_per_client():
+    """Returns the configured requests each client should send."""
+    return get(cs.ODIN_CONF, cs.CLIENT_SECTION, cs.REQS_PER_CLIENT)
+
+
+def get_slice():
+    """Returns the configured slice."""
+    return get(cs.ODIN_CONF, cs.PL_SECTION, cs.SLICE)
 
 
 def get_blacklisted_hosts():

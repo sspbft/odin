@@ -39,6 +39,7 @@ def generate_heimdall_sd(nodes):
 
 
 def launch():
+    """TODO write me."""
     pl_slice = conf.get_slice()
     node_count = conf.get_number_of_nodes()
     byz_count = conf.get_number_of_byzantine()
@@ -47,11 +48,13 @@ def launch():
     regular_nodes = nodes[byz_count:]
     byz_nodes = nodes[:byz_count]
 
-    generate_heimdall_sd(regular_nodes + byz_nodes)
-    deploy(regular_nodes, byz_nodes)
+    if io.exists(conf.get_heimdall_sd_path()):
+        generate_heimdall_sd(byz_nodes + regular_nodes)
+    deploy(byz_nodes, regular_nodes)
 
 
 def cleanup():
+    """TODO write me."""
     user = conf.get_slice()
     with open("hosts.txt") as f:
         for l in f.readlines():
@@ -60,6 +63,7 @@ def cleanup():
 
 
 def on_sig_term(signal, frame):
+    """TODO write me."""
     logger.info("Quitting and killing all processes on PL nodes")
     cleanup()
     ps.kill_all_subprocesses()
@@ -74,23 +78,28 @@ def setup_heimdall(debug=False):
     is specified, this methods starts heimdall as a subprocess.
     """
     heimdall_root = conf.get_heimdall_root()
-    if heimdall_root is not None:
+    if heimdall_root is not None and io.exists(heimdall_root):
         logger.info("Launching Heimdall")
         dc = "docker-compose"
         if which(dc) is None:
             raise EnvironmentError("Can't find docker-compose binary.")
-        p = subprocess.Popen(f"{dc} down && {dc} up > /dev/null", shell=True,
+        p = subprocess.Popen(f"rm -r ./prometheus/data && {dc} down && " +
+                             f"{dc} up > /dev/null", shell=True,
                              cwd=heimdall_root)
         ps.add_subprocess_pid(p.pid)
         logger.info(f"Starting Heimdall with PID {p.pid}")
         logger.info("Grafana can be found on http://localhost:3000")
     else:
-        logger.info("Heimdall not configured, skipping")
+        logger.info("Heimdall not configured correctly, skipping")
 
 
 if __name__ == "__main__":
+    """Main entrypoint for Odin."""
+
+    # register SIGINT handler
     signal.signal(signal.SIGINT, on_sig_term)
 
+    # check if cleanup or regular deploy
     if len(sys.argv) > 1 and sys.argv[1] == "cleanup":
         cleanup()
     else:

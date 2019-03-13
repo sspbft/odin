@@ -18,11 +18,11 @@ class Node:
         return f"{self.hostname},{self.ip}:{self.port}"
 
 
-def get_nodes():
-    """Parses nodes file to a dict of nodes such that dct[id] = node."""
-    if not os.path.isfile("../hosts.txt"):
-        raise ValueError(f"Could not find hosts file in Odin root dir")
-    with open("../hosts.txt") as f:
+def get_nodes(hosts_path="../hosts.txt"):
+    """Parses a hosts file to a dict of nodes such that dct[id] = node."""
+    if not os.path.isfile(hosts_path):
+        raise ValueError(f"Could not find hosts file at {hosts_path}")
+    with open(hosts_path) as f:
         lines = [x.strip().split(",") for x in f.readlines()]
         nodes = {}
         for l in lines:
