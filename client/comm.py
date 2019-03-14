@@ -2,6 +2,7 @@
 
 # standard
 import http.client
+import requests
 import json
 import time
 import asyncio
@@ -9,6 +10,8 @@ import asyncio
 
 # local
 from node import get_nodes
+
+nodes = get_nodes()
 
 
 def build_payload(client_id, op, args):
@@ -23,40 +26,28 @@ def build_payload(client_id, op, args):
     }
 
 
-async def send_to_node(node, payload):
+async def send_to_node(node_id, payload):
     """
     Sends the given payload as a POST request to a Node.
 
     Tries to send the request up to 5 times with 1 second interval, will
     quit if 5 failed attempts is reached.
     """
-    sent = False
-    fails = 0
-    connection = http.client.HTTPConnection(node.ip, node.api_port)
-    headers = {"Content-type": "application/json"}
-    payload_json = json.dumps(payload)
-    # print(f"sending {payload_json} to {node}")
-    while not sent and fails < 5:
-        try:
-            connection.request("POST", "/inject-client-req", payload_json,
-                               headers)
-            sent = True
-        except Exception:
-            fails = fails + 1
-            await asyncio.sleep(1)
-            continue
+    node = nodes[node_id]
+    url = f"http://{node.ip}:{node.api_port}/inject-client-req"
+    requests.post(url, json=payload)
+    return
 
 
 async def broadcast(payload, nodes=get_nodes()):
     """Broadcast the request to all running BFTList nodes."""
     tasks = []
     for _, node in nodes.items():
-        # t = Thread(target=send_to_node, args=(node, payload))
-        # t.start()
-        # threads.append(t)
         tasks.append(send_to_node(node, payload))
-    # for t in threads:
-    #     t.join()
-    print(f"Sending payload {payload} to all nodes")
     await asyncio.gather(*tasks)
     return
+
+
+def get_state_for_node(node_id):
+    data = requests.get(f"http://localhost:400{node_id}/data").json()
+    return data["REPLICATION_MODULE"]["rep_state"]

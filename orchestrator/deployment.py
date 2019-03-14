@@ -41,17 +41,17 @@ def deploy(byz_nodes, regular_nodes):
     for n in byz_nodes + regular_nodes:
         logger.info(f"Node {i} running on {n['hostname']}")
         i += 1
-    # for n in regular_nodes:
-    #     logger.info(f"Byzantine node {i} running on {n['hostname']}")
-    #     i += 1
 
-    # wait
     forever = Event()
     forever.wait()
 
 
 def deploy_and_run(node, node_id):
-    deploy_node(node)
+    ret_code = deploy_node(node)
+    if ret_code != 0:
+        logger.error(f"Deployment to {node['hostname']} failed")
+    logger.info(f"Launching app on host {node['hostname']} with " +
+                f"ID {node_id}")
     launch_using_thor(node["hostname"], node_id)
     return
 
@@ -79,6 +79,7 @@ def deploy_node(node):
     )
     logger.info(f"Node {hostname} provisioned")
 
+    logger.info(f"Transferring app files to {hostname}")
     # transfer app files and set up app
     conn.transfer_files(
         hostname,

@@ -18,8 +18,11 @@ class Node:
         return f"{self.hostname},{self.ip}:{self.port}"
 
 
-def get_nodes(hosts_path="../hosts.txt"):
+def get_nodes(hosts_path=None):
     """Parses a hosts file to a dict of nodes such that dct[id] = node."""
+    if hosts_path is None:
+        hosts_path = os.getenv("HOSTS_PATH", "../hosts.txt")
+
     if not os.path.isfile(hosts_path):
         raise ValueError(f"Could not find hosts file at {hosts_path}")
     with open(hosts_path) as f:

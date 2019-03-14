@@ -37,3 +37,6 @@ HEIMDALL_ROOT = "heimdall_root"
 API_URL = "https://www.planet-lab.eu/PLCAPI/"
 NODE_HEALTHY = "boot"
 NODE_CMD_THRESHOLD = 5
+
+# Etc
+HEALTH_CHECK_PORT = 8080
