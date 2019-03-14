@@ -33,13 +33,18 @@ async def send_to_node(node_id, payload):
     Tries to send the request up to 5 times with 1 second interval, will
     quit if 5 failed attempts is reached.
     """
-    node = nodes[node_id]
+    # if type(node_id) == "Node":
+    #     node_id = node_id.id
+    if type(node_id) == int:
+        node = nodes[node_id]
+    else:
+        node = node_id
     url = f"http://{node.ip}:{node.api_port}/inject-client-req"
     requests.post(url, json=payload)
     return
 
 
-async def broadcast(payload, nodes=get_nodes()):
+async def broadcast(payload, nodes=get_nodes("../hosts.txt")):
     """Broadcast the request to all running BFTList nodes."""
     tasks = []
     for _, node in nodes.items():
