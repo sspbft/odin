@@ -1,58 +1,65 @@
 """Methods related to communication with BFTList nodes."""
 
 # standard
-import http.client
 import requests
 import json
+import jsonpickle
 import time
 import asyncio
 # from threading import Thread
 
 # local
-from node import get_nodes
+from node import Node, get_nodes
 
 nodes = get_nodes()
 
 
-def build_payload(client_id, op, args):
-    """Builds a request object to be sent to all BFTList nodes."""
+def build_payload(client_id, arg):
+    """Builds an APPEND request object to be sent to all BFTList nodes."""
     return {
         "client_id": client_id,
         "timestamp": int(time.time()),
         "operation": {
-            "type": op,
-            "args": args
+            "type": "APPEND",
+            "args": arg
         }
     }
 
 
-async def send_to_node(node_id, payload):
+async def send_to_node(node: Node, req):
     """
-    Sends the given payload as a POST request to a Node.
+    Sends the given req as a POST request to a Node.
 
     Tries to send the request up to 5 times with 1 second interval, will
     quit if 5 failed attempts is reached.
     """
-    # if type(node_id) == "Node":
-    #     node_id = node_id.id
-    if type(node_id) == int:
-        node = nodes[node_id]
-    else:
-        node = node_id
+    req_injected = False
+    tries = 0
     url = f"http://{node.ip}:{node.api_port}/inject-client-req"
-    requests.post(url, json=payload)
+    # keep sending client request until API returns 200, max 5 tries
+    while not req_injected and tries < 5:
+        r = requests.post(url, json=req)
+        tries += 1
+        if r.status_code != 200:
+            print(f"Coult not inject req {req} to node {node.id}, re-trying")
+            await asyncio.sleep(1)
+        else:
+            req_injected = True
     return
 
 
-async def broadcast(payload, nodes=get_nodes("../hosts.txt")):
+async def broadcast(req):
     """Broadcast the request to all running BFTList nodes."""
+    nodes = get_nodes()
     tasks = []
+    print(f"broadcasting req APPEND {req['operation']['args']}")
     for _, node in nodes.items():
-        tasks.append(send_to_node(node, payload))
+        tasks.append(send_to_node(node, req))
+    # wait for request to be sent to all nodes
     await asyncio.gather(*tasks)
     return
 
 
-def get_state_for_node(node_id):
-    data = requests.get(f"http://localhost:400{node_id}/data").json()
-    return data["REPLICATION_MODULE"]["rep_state"]
+def get_data_for_node(node):
+    data = requests.get(f"http://{node.hostname}:{4000+node.id}/data").json()
+    return data

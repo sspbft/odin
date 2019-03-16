@@ -50,6 +50,8 @@ def launch():
 
     if io.exists(conf.get_heimdall_sd_path()):
         generate_heimdall_sd(byz_nodes + regular_nodes)
+
+    setup_heimdall()
     deploy(byz_nodes, regular_nodes)
 
 
@@ -104,5 +106,4 @@ if __name__ == "__main__":
         cleanup()
     else:
         setup_logging()
-        setup_heimdall()
         launch()

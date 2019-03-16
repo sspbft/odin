@@ -7,9 +7,10 @@ the system.
 
 import argparse
 import asyncio
+import time
 
-import comm
 from node import get_nodes
+from comm import broadcast, build_payload, get_data_for_node
 
 # setup argparse
 parser = argparse.ArgumentParser(description='BFTList client script.')
@@ -21,48 +22,31 @@ parser.add_argument("REQS_PER_CLIENT",
                     help="requests to be sent for each client", type=int)
 
 
-async def send_reqs_to_node(node_id, reqs):
-    print(f"Sending {len(reqs)} reqs to node {node_id}")
-    for req in reqs:
-        await send_req(node_id, req)
+async def req_applied(req, nodes):
+    """Blocks until the supplied request is the last execed req on >= 1 nodes"""
+    applied = False
+    # arg = req["operation"]["args"]
+    client_id = req["client_id"]
+    while not applied:
+        for n_id in nodes:
+            n_data = get_data_for_node(nodes[n_id])
+            last_req = n_data["REPLICATION_MODULE"]["last_req"]
+            if len(last_req) < client_id or last_req[client_id] == -1:
+                continue
+            last_execed = last_req[client_id]["request"]["client_request"]
+            if last_execed["timestamp"] == req["timestamp"]:
+                applied = True
+                break
     return
 
-async def send_req(node_id, payload):
-    print(f"Sending req {payload} to {node_id}")
-    await comm.send_to_node(node_id, payload)
-    print("Here")
 
-    # wait for request to be applied before returning
-    applied = False
-    while not applied:
-        state = comm.get_state_for_node(node_id)
-        print(payload["operation"]["args"], state)
-        if payload["operation"]["args"] in state:
-            print(f"Req {payload} applied on node {node_id}")
-            applied = True
-        else:
-            await asyncio.sleep(0.25)
-
-
-
-async def launch_client(client_id, nbr_of_reqs_to_send, nodes):
-    """TODO write me."""
-    print(f"Launching client with ID {client_id}")
-
-    # one queue for each node
-    reqs = {n_id: [] for n_id in nodes}
-
-    # add all requests to corresponding queue for each node
-    for i in range(0, nbr_of_reqs_to_send):
-        payload = comm.build_payload(client_id, "APPEND", client_id + i)
-        for n_id in reqs:
-            reqs[n_id].append(payload)
-
-    tasks = []
-    for n_id in reqs:
-        tasks.append(send_reqs_to_node(n_id, reqs[n_id]))
-    await asyncio.gather(*tasks)
-    print("All requests are sent")
+async def run_client(client_id, reqs_count, nodes):
+    """Send reqs_count reqs to all nodes with specified client_id."""
+    start_val = client_id * 100
+    for r in range(start_val, start_val + reqs_count):
+        req = build_payload(client_id, r)
+        await broadcast(req)
+        await req_applied(req, nodes)
     return
 
 
@@ -71,16 +55,17 @@ async def main():
     nodes = get_nodes()
     n = len(nodes)
     client_count = int(args.NBR_OF_CLIENTS / n)
-    i = args.ID * client_count
 
     tasks = []
-    for i in range(i, i + client_count):
-        t = launch_client(i * 100, args.REQS_PER_CLIENT, nodes)
+    start_time = time.time()
+    for i in range(args.ID * 100, args.ID * 100 + client_count):
+        t = run_client(i, args.REQS_PER_CLIENT, nodes)
         tasks.append(t)
-
     await asyncio.gather(*tasks)
-    total_reqs = client_count * args.REQS_PER_CLIENT
-    print(f"{total_reqs} reqs sent by {client_count} clients")
+    count = client_count * args.REQS_PER_CLIENT
+    end_time = time.time()
+    print(f"Process {args.ID}: {count} reqs injected by {client_count} " +
+          f"clients in {end_time - start_time} s")
 
 if __name__ == '__main__':
     asyncio.run(main())
