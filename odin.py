@@ -31,7 +31,7 @@ def generate_heimdall_sd(nodes):
 
     # add all instances on Docker host to targets (only in local mode)
     for i, node in enumerate(nodes):
-        sd["targets"].append(f"{node['hostname']}:{6000 + i}")
+        sd["targets"].append(f"{node['hostname']}:{3000 + i}")
 
     json_string = json.dumps([sd])
     io.write_file(path, json_string)
