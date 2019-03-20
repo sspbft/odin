@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 def get_node_ids_for_slice(slice_name):
-    logger.info(f"Querying PL API for nodes on slice {slice_name}")
+    logger.info(f"Querying PL API for nodes attached to slice {slice_name}")
     slices = api_server.GetSlices(auth, slice_name)
     if len(slices) == 0:
         logger.error(f"No slice with name {slice_name} could be found")
@@ -34,7 +34,7 @@ def get_nodes_for_slice(slice_name, count):
     nodes = []
     blacklisted_nodes = conf.get_blacklisted_hosts()
 
-    logger.info(f"found nodes: {node_ids}")
+    logger.info(f"Found nodes for {slice_name}: {node_ids}")
 
     for n_id in node_ids:
         details = get_node_details(n_id)
@@ -69,6 +69,11 @@ def get_node_details(node_id):
     return nodes[0]
 
 
+def get_all_nodes():
+    logger.info("Checking ALL nodes on PlanetLab to see which are healthy")
+    return api_server.GetNodes(auth)
+
+
 def is_node_healthy(node_details):
     """Health check for a PlanetLab node."""
     hostname = node_details["hostname"]
@@ -100,6 +105,8 @@ def is_node_healthy(node_details):
     ) != 0:
         logger.error(f"Could not run healthcheck script on {hostname}")
         return False
+    else:
+        logger.info(f"Launched healthcheck script on {hostname}")
 
     i = 0
     connected = False

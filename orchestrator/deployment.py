@@ -16,22 +16,17 @@ def generate_hosts_file(nodes):
             f.write(f"{i},{n['hostname']},{ip},{5000+i}\n")
 
 
-def deploy(byz_nodes, regular_nodes):
+def deploy(byz_nodes, regular_nodes, args):
     generate_hosts_file(byz_nodes + regular_nodes)
 
     threads = []
     i = 0
     for n in byz_nodes + regular_nodes:
-        t = Thread(target=deploy_and_run, args=(n, i))
+        t = Thread(target=deploy_and_run, args=(n, i, args))
         t.start()
         threads.append(t)
         i += 1
-    # for n in byz_nodes:
-    #     threads.append(Thread(target=deploy_and_run, args=(n, i)))
-    #     i += 1
 
-    # for t in threads:
-    #     t.start()
     for t in threads:
         t.join()
 
@@ -46,20 +41,25 @@ def deploy(byz_nodes, regular_nodes):
     forever.wait()
 
 
-def deploy_and_run(node, node_id):
+def deploy_and_run(node, node_id, args):
     ret_code = deploy_node(node)
     if ret_code != 0:
         logger.error(f"Deployment to {node['hostname']} failed")
     logger.info(f"Launching app on host {node['hostname']} with " +
                 f"ID {node_id}")
-    launch_using_thor(node["hostname"], node_id)
+    launch_using_thor(node["hostname"], node_id, args)
     return
 
 
 def deploy_node(node):
-    logger.info(f"Deploying BFTList to node {node['hostname']}")
+    git_url = conf.get_application_git_url()
+    git_branch = conf.get_application_git_branch()
+    app_folder = conf.get_app_folder()
     target_dir = conf.get_target_dir()
+    app_dir = f"{target_dir}/{app_folder}"
     hostname = node["hostname"]
+    logger.info(f"Deploying {app_folder} on branch {git_branch} to node " +
+                f"{hostname}")
 
     conn.run_command(hostname, f"pkill -u {conf.get_slice()}")
 
@@ -90,10 +90,6 @@ def deploy_node(node):
         target_dir
     )
 
-    git_url = conf.get_application_git_url()
-    git_branch = conf.get_application_git_branch()
-    app_folder = conf.get_app_folder()
-    app_dir = f"{target_dir}/{app_folder}"
     conn.run_command(hostname, f"cd {target_dir} && git clone {git_url}" +
                                f" && cd {app_folder} && git checkout " +
                                f"{git_branch} && git pull")
@@ -107,7 +103,7 @@ def deploy_node(node):
     return conn.run_command(hostname, f"rm ~/bootstrap_node.sh")
 
 
-def launch_using_thor(hostname, i):
+def launch_using_thor(hostname, i, args):
     thor_dir = f"{conf.get_target_dir()}/thor"
     n = conf.get_number_of_nodes()
     f = conf.get_number_of_byzantine()
@@ -115,7 +111,9 @@ def launch_using_thor(hostname, i):
     e = conf.get_app_entrypoint()
     lp = f"{conf.get_target_dir()}/application.log"
     rs = conf.get_app_run_sleep()
+    nss_flag = " -nss " if args.non_selfstab else " "
     cmd_string = (f"cd {thor_dir} && source ./env/bin/activate && " +
                   f"python thor.py -n {n} -f {f} -p {p} -e '{e}' " +
-                  f"-i {i} -lp {lp} -rs {rs} planetlab &")
+                  f"-i {i} -lp {lp} -rs {rs}{nss_flag}planetlab &")
+    logging.info(f"Launching Thor with cmd: {cmd_string} on {hostname}")
     return conn.run_command(hostname, cmd_string)

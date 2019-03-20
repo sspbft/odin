@@ -10,8 +10,19 @@ import signal
 import helpers.io as io
 import helpers.ps as ps
 from shutil import which
+import argparse
+from helpers.constants import CLEANUP, DEPLOY, FIND_HEALTHY
+from threading import Thread
 
 logger = logging.getLogger(__name__)
+parser = argparse.ArgumentParser(
+    description="CLI for deploying applications to PlanetLab")
+parser.add_argument("mode",
+                    help="either [deploy], [cleanup] or [find_healthy]")
+parser.add_argument("-b", "--git-branch", help="the git branch to deploy")
+parser.add_argument("-nss", "--non-selfstab",
+                    help="run application without self-stabilization",
+                    action="store_true")
 
 
 def setup_logging():
@@ -38,7 +49,7 @@ def generate_heimdall_sd(nodes):
     return
 
 
-def launch():
+def launch(args):
     """TODO write me."""
     pl_slice = conf.get_slice()
     node_count = conf.get_number_of_nodes()
@@ -52,7 +63,7 @@ def launch():
         generate_heimdall_sd(byz_nodes + regular_nodes)
 
     setup_heimdall()
-    deploy(byz_nodes, regular_nodes)
+    deploy(byz_nodes, regular_nodes, args)
 
 
 def cleanup():
@@ -95,15 +106,51 @@ def setup_heimdall(debug=False):
         logger.info("Heimdall not configured correctly, skipping")
 
 
+def check_node(node, f_healthy, f_faulty):
+    hostname = node["hostname"]
+    logger.info(f"Checking node {hostname} to see if it is healthy")
+    if api.is_node_healthy(node):
+        f_healthy.write(f"{hostname}\n")
+    else:
+        f_faulty.write(f"{hostname}\n")
+
+
+def find_healthy_nodes():
+    nodes = api.get_all_nodes()
+
+    threads = []
+    f_healthy = open("etc/healthy_nodes.txt", "w+")
+    f_faulty = open("etc/faulty_nodes.txt", "w+")
+    logger.info(f"Checking {len(nodes)} nodes to see if they're healthy")
+    for n in nodes:
+        t = Thread(target=check_node, args=(n, f_healthy, f_faulty))
+        t.start()
+        threads.append(t)
+    for t in threads:
+        t.join()
+    logger.info("All nodes checked")
+
+
 if __name__ == "__main__":
     """Main entrypoint for Odin."""
 
-    # register SIGINT handler
-    signal.signal(signal.SIGINT, on_sig_term)
+    setup_logging()
 
-    # check if cleanup or regular deploy
-    if len(sys.argv) > 1 and sys.argv[1] == "cleanup":
+    # parse args
+    args = parser.parse_args()
+    if args.git_branch:
+        conf.set_application_git_branch(args.git_branch)
+    mode = args.mode
+
+    if args.mode == CLEANUP:
         cleanup()
+    elif args.mode == FIND_HEALTHY:
+        find_healthy_nodes()
+    elif args.mode == DEPLOY:
+        # register SIGINT handler
+        signal.signal(signal.SIGINT, on_sig_term)
+
+        launch(args)
     else:
-        setup_logging()
-        launch()
+        logger.error(f"Invalid mode {mode}, check help")
+        sys.exit(1)

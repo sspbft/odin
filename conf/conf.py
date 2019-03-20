@@ -51,6 +51,11 @@ def get_application_git_branch():
     return get(cs.ODIN_CONF, cs.APP_SECTION, cs.GIT_BRANCH)
 
 
+def set_application_git_branch(branch):
+    """Override the application git branch."""
+    odin_conf.set(cs.APP_SECTION, cs.GIT_BRANCH, branch)
+
+
 def get_bootstrap_script():
     """Returns the configured path of the bootstrap script for the app."""
     return get(cs.ODIN_CONF, cs.APP_SECTION, cs.BOOTSTRAP_SCRIPT)
@@ -79,26 +84,6 @@ def get_app_entrypoint():
 def get_app_run_sleep():
     """Returns the entrypoint command that starts the app."""
     return get(cs.ODIN_CONF, cs.APP_SECTION, cs.RUN_SLEEP)
-
-
-def get_client_src():
-    """Return the folder containing the client code."""
-    return get(cs.ODIN_CONF, cs.CLIENT_SECTION, cs.CLIENT_SRC)
-
-
-def get_client_entrypoint():
-    """Return the configured entrypoint script for a client process."""
-    return get(cs.ODIN_CONF, cs.CLIENT_SECTION, cs.CLIENT_ENTRYPOINT)
-
-
-def get_nbr_of_clients():
-    """Return the configured number of clients that should be started."""
-    return get(cs.ODIN_CONF, cs.CLIENT_SECTION, cs.NBR_OF_CLIENTS)
-
-
-def get_reqs_per_client():
-    """Returns the configured requests each client should send."""
-    return get(cs.ODIN_CONF, cs.CLIENT_SECTION, cs.REQS_PER_CLIENT)
 
 
 def get_slice():
