@@ -98,3 +98,15 @@ pip install --upgrade pip
 pip install -r requirements.txt
 deactivate
 log "Thor installed and bootstrapped"
+
+log "Fetching BFTList-client"
+cd /practicalbft
+git clone https://github.com/practicalbft/BFTList-client.git
+cd BFTList-client
+python3.7 -m venv env
+source ./env/bin/activate
+chmod +x *.sh
+pip install --upgrade pip
+pip install -r requirements.txt
+deactivate
+log "BFTList-client installed and bootstrapped"

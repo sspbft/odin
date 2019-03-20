@@ -20,12 +20,6 @@ APP_FOLDER = "app_folder"
 ENTRYPOINT = "entrypoint"
 RUN_SLEEP = "run_sleep"
 
-CLIENT_SECTION = "client"
-CLIENT_SRC = "client_src"
-CLIENT_ENTRYPOINT = "client_entrypoint"
-NBR_OF_CLIENTS = "number_of_clients"
-REQS_PER_CLIENT = "reqs_per_client"
-
 PL_SECTION = "planetlab"
 BLACKLISTED_HOSTS = "blacklisted_hosts"
 
@@ -37,3 +31,11 @@ HEIMDALL_ROOT = "heimdall_root"
 API_URL = "https://www.planet-lab.eu/PLCAPI/"
 NODE_HEALTHY = "boot"
 NODE_CMD_THRESHOLD = 5
+
+# Etc
+HEALTH_CHECK_PORT = 8080
+
+# CLI Args
+DEPLOY = "deploy"
+CLEANUP = "cleanup"
+FIND_HEALTHY = "find_healthy"
