@@ -39,3 +39,5 @@ HEALTH_CHECK_PORT = 8080
 DEPLOY = "deploy"
 CLEANUP = "cleanup"
 FIND_HEALTHY = "find_healthy"
+ADD_ALL_NODES_TO_SLICE = "add_all_nodes"
+ADD_HEALTHY_NODES_TO_SLICE = "add_healthy"
