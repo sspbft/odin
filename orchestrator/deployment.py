@@ -43,7 +43,7 @@ def deploy(byz_nodes, regular_nodes, args):
 
 
 def deploy_and_run(node, node_id, args):
-    ret_code = deploy_node(node)
+    ret_code = deploy_node(node, args.starting_state)
     if ret_code != 0:
         logger.error(f"Deployment to {node['hostname']} failed")
     logger.info(f"Launching app on host {node['hostname']} with " +
@@ -52,7 +52,7 @@ def deploy_and_run(node, node_id, args):
     return
 
 
-def deploy_node(node):
+def deploy_node(node, starting_state_path):
     git_url = conf.get_application_git_url()
     git_branch = conf.get_application_git_branch()
     app_folder = conf.get_app_folder()
@@ -100,6 +100,16 @@ def deploy_node(node):
 
     logger.info(f"{app_folder} setup on {hostname}")
 
+    # transfer start state json file to node if arg supplied
+    if starting_state_path:
+        logger.info(f"Transferring start state file at {starting_state_path}" +
+                    f" to {hostname}")
+        conn.transfer_files(
+            hostname,
+            [io.get_abs_path(starting_state_path)],
+            "/practicalbft/BFTList/conf"
+        )
+
     # cleanup
     return conn.run_command(hostname, f"rm ~/bootstrap_node.sh")
 
@@ -113,8 +123,9 @@ def launch_using_thor(hostname, i, args):
     lp = f"{conf.get_target_dir()}/application.log"
     rs = conf.get_app_run_sleep()
     nss_flag = " -nss " if args.non_selfstab else " "
+    ss_flag = " -ss " if args.starting_state else " "
     cmd_string = (f"cd {thor_dir} && source ./env/bin/activate && " +
                   f"python thor.py -n {n} -f {f} -p {p} -e '{e}' " +
-                  f"-i {i} -lp {lp} -rs {rs}{nss_flag}planetlab &")
+                  f"-i {i} -lp {lp} -rs {rs}{nss_flag}{ss_flag}planetlab &")
     logging.info(f"Launching Thor with cmd: {cmd_string} on {hostname}")
     return conn.run_command(hostname, cmd_string)

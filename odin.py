@@ -28,6 +28,8 @@ parser.add_argument("-nss", "--non-selfstab",
 parser.add_argument("-f", "--hosts-file", help="file containing hosts")
 parser.add_argument("-r", "--reuse-hosts", help="re-use hosts from last " +
                     "deployment", action="store_true")
+parser.add_argument("-ss", "--starting-state", help="path to " +
+                    "start_state.json for state injection")
 
 
 def setup_logging():
