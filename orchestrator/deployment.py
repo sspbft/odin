@@ -17,7 +17,8 @@ def generate_hosts_file(nodes):
 
 
 def deploy(byz_nodes, regular_nodes, args):
-    generate_hosts_file(byz_nodes + regular_nodes)
+    if not args.reuse_hosts:
+        generate_hosts_file(byz_nodes + regular_nodes)
 
     threads = []
     i = 0

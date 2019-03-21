@@ -161,5 +161,16 @@ def is_online(hostname):
 
 def responding_to_ping(hostname):
     """Pings the specified hostname and returns if ping was successful."""
-    logger.info(f"Checking if {hostname} responds to ping")
     return os.system(f"ping -c 1 {hostname} > /dev/null") == 0
+
+
+def set_nodes_for_slice(nodes, slice_name=conf.get_slice()):
+    api_server.UpdateSlice(auth, slice_name, {"nodes": nodes})
+    logger.info(f"Set nodes {nodes} for slice {slice_name}")
+
+
+def add_all_nodes_to_slice(slice_name=conf.get_slice()):
+    """Adds ALL nodes on PlanetLab to slice."""
+    nodes = get_all_nodes()
+    nodes = list(map(lambda n: n["node_id"], nodes))
+    set_nodes_for_slice(nodes)

@@ -14,13 +14,15 @@ else
         exit 1
 fi
 
-if ! [ -x "$(command -v ncat)" ]; then
-        sudo yum -y install nmap
-fi
+if [ -x "$(command -v python)" ]; then
+        python -m SimpleHTTPServer 8080
 
-# Listen for connections on external interface
-echo "Listening for connections on ${1:-8080}"
-RESPONSE="HTTP/1.1 200 OK\r\nConnection: keep-alive\r\n\r\n${2:-"OK"}\r\n"
-while { echo -en "$RESPONSE"; } | ncat -l 0.0.0.0 "${1:-8080}"; do
-  echo "================================================"
-done
+elif ! [ -x "$(command -v ncat)" ]; then
+        sudo yum -y install nmap
+        # Listen for connections on external interface
+        echo "Listening for connections on ${1:-8080}"
+        RESPONSE="HTTP/1.1 200 OK\r\nConnection: keep-alive\r\n\r\n${2:-"OK"}\r\n"
+        while { echo -en "$RESPONSE"; } | ncat -l 0.0.0.0 "${1:-8080}"; do
+        echo "================================================"
+        done
+fi

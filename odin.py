@@ -11,8 +11,10 @@ import helpers.io as io
 import helpers.ps as ps
 from shutil import which
 import argparse
-from helpers.constants import CLEANUP, DEPLOY, FIND_HEALTHY
-from threading import Thread
+from helpers.constants import (CLEANUP, DEPLOY, FIND_HEALTHY,
+                               ADD_ALL_NODES_TO_SLICE,
+                               ADD_HEALTHY_NODES_TO_SLICE)
+from node_health.health import find_healthy_nodes
 
 logger = logging.getLogger(__name__)
 parser = argparse.ArgumentParser(
@@ -23,6 +25,9 @@ parser.add_argument("-b", "--git-branch", help="the git branch to deploy")
 parser.add_argument("-nss", "--non-selfstab",
                     help="run application without self-stabilization",
                     action="store_true")
+parser.add_argument("-f", "--hosts-file", help="file containing hosts")
+parser.add_argument("-r", "--reuse-hosts", help="re-use hosts from last " +
+                    "deployment", action="store_true")
 
 
 def setup_logging():
@@ -55,7 +60,20 @@ def launch(args):
     node_count = conf.get_number_of_nodes()
     byz_count = conf.get_number_of_byzantine()
 
-    nodes = api.get_nodes_for_slice(pl_slice, node_count)
+    if not args.reuse_hosts:
+        logger.info("Fetching nodes for slice")
+        nodes = api.get_nodes_for_slice(pl_slice, node_count)
+    else:
+        logger.info("Re-using nodes from hosts.txt")
+        if not io.exists("hosts.txt"):
+            logger.error("Can't re-use hosts from non-existing hosts.txt")
+            sys.exit(1)
+        # parse hosts file
+        with open("hosts.txt") as f:
+            lines = [x.rstrip() for x in f.readlines()]
+            nodes = [{"id": l.split(",")[0], "hostname": l.split(",")[1]}
+                     for l in lines]
+
     regular_nodes = nodes[byz_count:]
     byz_nodes = nodes[:byz_count]
 
@@ -101,34 +119,9 @@ def setup_heimdall(debug=False):
                              cwd=heimdall_root)
         ps.add_subprocess_pid(p.pid)
         logger.info(f"Starting Heimdall with PID {p.pid}")
-        logger.info("Grafana can be found on http://localhost:3000")
+        logger.info("Grafana can be found on http://localhost:6060")
     else:
         logger.info("Heimdall not configured correctly, skipping")
-
-
-def check_node(node, f_healthy, f_faulty):
-    hostname = node["hostname"]
-    logger.info(f"Checking node {hostname} to see if it is healthy")
-    if api.is_node_healthy(node):
-        f_healthy.write(f"{hostname}\n")
-    else:
-        f_faulty.write(f"{hostname}\n")
-
-
-def find_healthy_nodes():
-    nodes = api.get_all_nodes()
-
-    threads = []
-    f_healthy = open("etc/healthy_nodes.txt", "w+")
-    f_faulty = open("etc/faulty_nodes.txt", "w+")
-    logger.info(f"Checking {len(nodes)} nodes to see if they're healthy")
-    for n in nodes:
-        t = Thread(target=check_node, args=(n, f_healthy, f_faulty))
-        t.start()
-        threads.append(t)
-    for t in threads:
-        t.join()
-    logger.info("All nodes checked")
 
 
 if __name__ == "__main__":
@@ -146,10 +139,18 @@ if __name__ == "__main__":
         cleanup()
     elif args.mode == FIND_HEALTHY:
         find_healthy_nodes()
+    elif args.mode == ADD_ALL_NODES_TO_SLICE:
+        api.add_all_nodes_to_slice()
+    elif args.mode == ADD_HEALTHY_NODES_TO_SLICE:
+        if not args.hosts_file:
+            logger.error(f"arg [hosts_file] is required")
+            sys.exit(1)
+        with open(args.hosts_file) as f:
+            node_ids = [int(l.rstrip().split(",")[0]) for l in f.readlines()]
+            api.set_nodes_for_slice(node_ids)
     elif args.mode == DEPLOY:
         # register SIGINT handler
         signal.signal(signal.SIGINT, on_sig_term)
-
         launch(args)
     else:
         logger.error(f"Invalid mode {mode}, check help")
