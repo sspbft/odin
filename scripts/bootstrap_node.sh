@@ -53,12 +53,12 @@ fi
 sudo /usr/local/sbin/remote_syslog -c ~/log_files.yml &
 
 log "Installing dependencies and build tools"
-sudo yum -y install gcc openssl-devel bzip2-devel
-sudo yum -y install gcc gcc-c++ 
-sudo yum -y install zlib zlib-devel
-sudo yum -y install libffi-devel 
-sudo yum install -y make
-sudo yum update -y nss curl
+sudo yum install gcc openssl-devel bzip2-devel -y --nogpgcheck
+sudo yum install gcc gcc-c++ -y --nogpgcheck
+sudo yum install zlib zlib-devel -y --nogpgcheck
+sudo yum install libffi-devel -y --nogpgcheck
+sudo yum install make -y --nogpgcheck
+sudo yum update nss curl -y --nogpgcheck
 
 if ! [ -x "$(command -v python3.7)" ]; then
 	install_python
@@ -83,7 +83,7 @@ fi
 
 if ! [ -x "$(command -v git)" ]; then
 	log "Installing git"
-	sudo yum install git -y
+	sudo yum install git -y --nogpgcheck
 else
 	log "git already installed, skipping"
 fi

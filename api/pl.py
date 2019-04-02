@@ -128,7 +128,7 @@ def is_node_healthy(node_details):
     conn.run_command(hostname, f"sudo pkill -f 'nc -l'")
 
     if not connected:
-        logger.warning(f"Could not connect to {hostname}:8080")
+        logger.warning(f"Could not connect to {hostname}:{HEALTH_CHECK_PORT}")
         return False
 
     logger.info(f"{hostname} is healthy!")

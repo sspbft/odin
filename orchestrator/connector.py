@@ -31,7 +31,7 @@ def transfer_files(hostname, files, target_dir, timeout=10):
                 logger.error(f"Got return code {ret_code} when copying {f} " +
                              f" to {hostname}. Error: {error}")
         except subprocess.TimeoutExpired:
-            logger.error(f"Transferring {files} to {hostname} timed out")
+            logger.error(f"Transferring {f} to {hostname} timed out")
             return 1
     log_file.close()
     return 0

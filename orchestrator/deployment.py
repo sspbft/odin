@@ -64,6 +64,7 @@ def deploy_node(node, starting_state_path):
 
     conn.run_command(hostname, f"pkill -u {conf.get_slice()}")
 
+    logger.info(f"Transferring bootstrap files to {hostname}")
     # provision node
     conn.transfer_files(
         hostname,
@@ -109,9 +110,6 @@ def deploy_node(node, starting_state_path):
             [io.get_abs_path(starting_state_path)],
             "/practicalbft/BFTList/conf"
         )
-
-    # cleanup
-    return conn.run_command(hostname, f"rm ~/bootstrap_node.sh")
 
 
 def launch_using_thor(hostname, i, args):

@@ -13,7 +13,8 @@ from shutil import which
 import argparse
 from helpers.constants import (CLEANUP, DEPLOY, FIND_HEALTHY,
                                ADD_ALL_NODES_TO_SLICE,
-                               ADD_HEALTHY_NODES_TO_SLICE)
+                               ADD_HEALTHY_NODES_TO_SLICE,
+                               REMOVE_NODES_FROM_SLICE)
 from node_health.health import find_healthy_nodes
 
 logger = logging.getLogger(__name__)
@@ -139,17 +140,20 @@ if __name__ == "__main__":
 
     if args.mode == CLEANUP:
         cleanup()
-    elif args.mode == FIND_HEALTHY:
-        find_healthy_nodes()
-    elif args.mode == ADD_ALL_NODES_TO_SLICE:
-        api.add_all_nodes_to_slice()
-    elif args.mode == ADD_HEALTHY_NODES_TO_SLICE:
-        if not args.hosts_file:
-            logger.error(f"arg [hosts_file] is required")
-            sys.exit(1)
-        with open(args.hosts_file) as f:
-            node_ids = [int(l.rstrip().split(",")[0]) for l in f.readlines()]
-            api.set_nodes_for_slice(node_ids)
+    # elif args.mode == FIND_HEALTHY:
+    #     find_healthy_nodes()
+    # stashed for now
+    # elif args.mode == ADD_ALL_NODES_TO_SLICE:
+    #     api.add_all_nodes_to_slice()
+    # elif args.mode == ADD_HEALTHY_NODES_TO_SLICE:
+    #     if not args.hosts_file:
+    #         logger.error(f"arg [hosts_file] is required")
+    #         sys.exit(1)
+    #     with open(args.hosts_file) as f:
+    #         node_ids = [int(l.rstrip().split(",")[0]) for l in f.readlines()]
+    #         api.set_nodes_for_slice(node_ids)
+    # elif args.mode == REMOVE_NODES_FROM_SLICE:
+    #     api.set_nodes_for_slice([], conf.get_slice())
     elif args.mode == DEPLOY:
         # register SIGINT handler
         signal.signal(signal.SIGINT, on_sig_term)

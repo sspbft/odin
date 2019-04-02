@@ -16,14 +16,10 @@ mv conf/auth.example.ini conf/auth.ini  # edit with appropriate details
 
 Modify `conf/odin.ini` to contain the appropriate configuration values.
 
-Then, it is as easy as running `python odin.py` and watching the magic happen!
-
 ## Deploying an application to PlanetLab
-`// TODO`
+First, make sure that everything is installed and that `conf/auth.ini` and `conf/odin.ini` exists and contain the right settings.
 
-## Using the bundled client for BFTList
-First, make sure that a deployment has been done and the nodes are running. Then run
-```
-cd client && ./start_shell
-```
-and start sending requests using the client shell!
+Then, Odin can be used as follows
+`python odin.py flags [--git-branch BRANCH --starting-state PATH_TO_JSON_FILE --non-selfstab --reuse-hosts] deploy|cleanup`
+
+After deploying, run `CTRL + C` in the same shell and Odin will kill off the running processes started by the user on the nodes.

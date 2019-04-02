@@ -1,4 +1,5 @@
 from threading import Thread
+from conf import conf
 import api.pl as api
 import logging
 
@@ -20,11 +21,19 @@ def check_node(node):
 
 
 def find_healthy_nodes():
-    nodes = api.get_all_nodes()
+    slc = conf.get_slice()
+    old_nodes = api.get_node_ids_for_slice(slc)
+    logger.info(f"Old nodes for {slc}: {old_nodes}")
+    logger.info(f"Attaching all nodes to slice temporarily")
+    all_nodes = api.get_all_nodes()
+    node_ids = list(map(lambda n: n["node_id"], all_nodes))
+    api.set_nodes_for_slice(node_ids)
+    count = api.get_node_ids_for_slice(slc)
+    logger.info(f"{conf.get_slice()} node has {count} nodes attached [temp]")
 
     threads = []
-    logger.info(f"Checking {len(nodes)} nodes to see if they're healthy")
-    for n in nodes:
+    logger.info(f"Checking {len(all_nodes)} nodes to see if they're healthy")
+    for n in all_nodes:
         t = Thread(target=check_node, args=(n,))
         t.start()
         threads.append(t)
@@ -41,3 +50,6 @@ def find_healthy_nodes():
         for n in faulty_nodes:
             f.write(f"{n}\n")
     logger.info(f"Healthy node discovery done!")
+
+    api.set_nodes_for_slice(old_nodes)
+    logger.info(f"Nodes for slice reset to {old_nodes}")
