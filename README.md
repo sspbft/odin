@@ -20,6 +20,6 @@ Modify `conf/odin.ini` to contain the appropriate configuration values.
 First, make sure that everything is installed and that `conf/auth.ini` and `conf/odin.ini` exists and contain the right settings.
 
 Then, Odin can be used as follows
-`python odin.py flags [--git-branch BRANCH --starting-state PATH_TO_JSON_FILE --non-selfstab --reuse-hosts] deploy|cleanup`
+`python odin.py flags [--git-branch BRANCH --starting-state PATH_TO_JSON_FILE --non-selfstab --reuse-hosts --scale SCALE_FACTOR] deploy|cleanup`
 
 After deploying, run `CTRL + C` in the same shell and Odin will kill off the running processes started by the user on the nodes.

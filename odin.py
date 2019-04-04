@@ -31,6 +31,8 @@ parser.add_argument("-r", "--reuse-hosts", help="re-use hosts from last " +
                     "deployment", action="store_true")
 parser.add_argument("-ss", "--starting-state", help="path to " +
                     "start_state.json for state injection")
+parser.add_argument("-s", "--scale", help="number of virtual instances on " +
+                    "each PL node", type=int, default=1)
 
 
 def setup_logging():
@@ -40,7 +42,7 @@ def setup_logging():
     logging.basicConfig(format=FORMAT, level=logging.INFO)
 
 
-def generate_heimdall_sd(nodes):
+def generate_heimdall_sd(nodes, scale_factor):
     """
     Generates the service discovery file used by the Prometheus container
     in Heimdall.
@@ -50,7 +52,10 @@ def generate_heimdall_sd(nodes):
 
     # add all instances on Docker host to targets (only in local mode)
     for i, node in enumerate(nodes):
-        sd["targets"].append(f"{node['hostname']}:{3000 + i}")
+        instance_id = i * scale_factor
+        for j in range(scale_factor):
+            sd["targets"].append(f"{node['hostname']}:{3000 + instance_id}")
+            instance_id += 1
 
     json_string = json.dumps([sd])
     io.write_file(path, json_string)
@@ -81,7 +86,7 @@ def launch(args):
     byz_nodes = nodes[:byz_count]
 
     if io.exists(conf.get_heimdall_sd_path()):
-        generate_heimdall_sd(byz_nodes + regular_nodes)
+        generate_heimdall_sd(byz_nodes + regular_nodes, args.scale)
 
     setup_heimdall()
     deploy(byz_nodes, regular_nodes, args)

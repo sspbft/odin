@@ -9,16 +9,19 @@ logger = logging.getLogger(__name__)
 SLICE = conf.get_slice()
 
 
-def generate_hosts_file(nodes):
+def generate_hosts_file(nodes, scale_factor):
     with open("hosts.txt", "w") as f:
         for i, n in enumerate(nodes):
+            instance_id = i * scale_factor
             ip = socket.gethostbyname(n["hostname"])
-            f.write(f"{i},{n['hostname']},{ip},{5000+i}\n")
+            for j in range(scale_factor):
+                f.write(f"{instance_id},{n['hostname']},{ip},{5000+instance_id}\n")
+                instance_id += 1
 
 
 def deploy(byz_nodes, regular_nodes, args):
     if not args.reuse_hosts:
-        generate_hosts_file(byz_nodes + regular_nodes)
+        generate_hosts_file(byz_nodes + regular_nodes, args.scale)
 
     threads = []
     i = 0
@@ -114,16 +117,18 @@ def deploy_node(node, starting_state_path):
 
 def launch_using_thor(hostname, i, args):
     thor_dir = f"{conf.get_target_dir()}/thor"
-    n = conf.get_number_of_nodes()
-    f = conf.get_number_of_byzantine()
+    n = conf.get_number_of_nodes() * args.scale
+    f = conf.get_number_of_byzantine() * args.scale
     p = conf.get_abs_path_to_app()
     e = conf.get_app_entrypoint()
     lp = f"{conf.get_target_dir()}/application.log"
     rs = conf.get_app_run_sleep()
+    s = args.scale
     nss_flag = " -nss " if args.non_selfstab else " "
     ss_flag = " -ss " if args.starting_state else " "
     cmd_string = (f"cd {thor_dir} && source ./env/bin/activate && " +
                   f"python thor.py -n {n} -f {f} -p {p} -e '{e}' " +
-                  f"-i {i} -lp {lp} -rs {rs}{nss_flag}{ss_flag}planetlab &")
+                  f"-i {i} -lp {lp} -rs {rs} -s {s}" +
+                  f"{nss_flag}{ss_flag}planetlab &")
     logging.info(f"Launching Thor with cmd: {cmd_string} on {hostname}")
     return conn.run_command(hostname, cmd_string)
