@@ -11,11 +11,7 @@ import helpers.io as io
 import helpers.ps as ps
 from shutil import which
 import argparse
-from helpers.constants import (CLEANUP, DEPLOY, FIND_HEALTHY,
-                               ADD_ALL_NODES_TO_SLICE,
-                               ADD_HEALTHY_NODES_TO_SLICE,
-                               REMOVE_NODES_FROM_SLICE)
-from node_health.health import find_healthy_nodes
+from helpers.constants import (CLEANUP, DEPLOY)
 
 logger = logging.getLogger(__name__)
 parser = argparse.ArgumentParser(

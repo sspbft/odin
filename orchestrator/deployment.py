@@ -15,7 +15,8 @@ def generate_hosts_file(nodes, scale_factor):
             instance_id = i * scale_factor
             ip = socket.gethostbyname(n["hostname"])
             for j in range(scale_factor):
-                f.write(f"{instance_id},{n['hostname']},{ip},{5000+instance_id}\n")
+                f.write(f"{instance_id},{n['hostname']},{ip}," +
+                        f"{5000+instance_id}\n")
                 instance_id += 1
 
 
