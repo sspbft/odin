@@ -55,6 +55,7 @@ def generate_heimdall_sd(nodes, scale_factor):
         instance_id = i * scale_factor
         for j in range(scale_factor):
             sd["targets"].append(f"{node['hostname']}:{3000 + instance_id}")
+            sd["targets"].append(f"{node['hostname']}:9111")
             instance_id += 1
 
     json_string = json.dumps([sd])

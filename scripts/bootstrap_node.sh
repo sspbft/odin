@@ -11,13 +11,9 @@ log () {
 install_python () {
 	log "Installing Python 3.7.2"
 	cd /usr/src
-	sudo wget https://www.python.org/ftp/python/3.7.2/Python-3.7.2.tgz
-	sudo tar xzf Python-3.7.2.tgz
+	wget https://www.python.org/ftp/python/3.7.2/Python-3.7.2.tgz
+	tar xzf Python-3.7.2.tgz
 	cd Python-3.7.2
-	# export LD_LIBRARY_PATH=$(which openssl):$LD_LIBRARY_PATH
-	# export LD_LIBRARY_PATH=/usr/local/openssl:$LD_LIBRARY_PATH
-	# sudo LDFLAGS="-L/usr/local/openssl" ./configure --enable-optimizations --with-openssl=/usr/local/openssl
-	# sudo LDFLAGS="-L$(which openssl)" ./configure --enable-optimizations --with-openssl=$(which openssl)
 	sudo ./configure --enable-optimizations
 	sudo make altinstall
 	sudo ln -s /usr/local/bin/python3.7 /bin/python3.7
@@ -35,12 +31,23 @@ install_rsyslog () {
 	log "remote_syslog installed"
 }
 
+install_node_exporter () {
+	log "Installing node_exporter"
+	cd /usr/src
+	wget https://github.com/prometheus/node_exporter/releases/download/v0.17.0/node_exporter-0.17.0.linux-amd64.tar.gz
+	tar -xvf node_exporter-0.17.0.linux-amd64.tar.gz
+	cd node_exporter-0.17.0.linux-amd64
+	sudo cp node_exporter /usr/local/sbin
+	log "node_exporter installed"
+}
+
 log "Bootstrapping node"
 rm -rf ~/wget-log*
 
 log "Setting up PracticalBFT dir"
 sudo rm -r /practicalbft
 sudo mkdir /practicalbft
+sudo chown -R chalmersple_2018_10_29 /usr/src/
 sudo chown -R chalmersple_2018_10_29 /practicalbft/
 cd /practicalbft
 
@@ -50,7 +57,15 @@ else
 	log "remote_syslog already installed, skipping"
 fi
 
-sudo /usr/local/sbin/remote_syslog -c ~/log_files.yml &
+if ! [ -x "$(command -v node_exporter)" ]; then
+	install_node_exporter
+else
+	log "node_exporter already installed, skipping"
+fi
+
+sudo nohup /usr/local/sbin/remote_syslog -c ~/log_files.yml >/dev/null 2>&1 &
+IP=$(curl ifconfig.me)
+nohup node_exporter --web.listen-address=$IP:9111 >/dev/null 2>&1 &
 
 log "Installing dependencies and build tools"
 sudo yum install gcc openssl-devel bzip2-devel -y --nogpgcheck
