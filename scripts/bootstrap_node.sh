@@ -63,9 +63,9 @@ else
 	log "node_exporter already installed, skipping"
 fi
 
-sudo nohup /usr/local/sbin/remote_syslog -c ~/log_files.yml >/dev/null 2>&1 &
+sudo nohup $(which remote_syslog) -c ~/log_files.yml >/dev/null 2>&1 &
 IP=$(curl ifconfig.me)
-nohup node_exporter --web.listen-address=$IP:9111 >/dev/null 2>&1 &
+nohup node_exporter --web.listen-address=$IP:9111 --collector.tcpstat >/dev/null 2>&1 &
 
 log "Installing dependencies and build tools"
 sudo yum install gcc openssl-devel bzip2-devel -y --nogpgcheck
