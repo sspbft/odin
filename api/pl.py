@@ -10,8 +10,9 @@ import os
 import sys
 import orchestrator.connector as conn
 import socket
+import ssl
 
-api_server = xc.ServerProxy(API_URL)
+api_server = xc.ServerProxy(API_URL, context=ssl._create_unverified_context())
 auth = get_auth()
 logger = logging.getLogger(__name__)
 
