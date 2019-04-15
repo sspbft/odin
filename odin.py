@@ -45,16 +45,17 @@ def generate_heimdall_sd(nodes, scale_factor):
     """
     path = conf.get_heimdall_sd_path()
     sd = {"targets": [], "labels": {"mode": "planetlab", "job": "bft-list"}}
+    sd2 = {"targets": [], "labels": {"mode": "planetlab", "job": "node-exporter"}}
 
     # add all instances on Docker host to targets (only in local mode)
     for i, node in enumerate(nodes):
         instance_id = i * scale_factor
         for j in range(scale_factor):
             sd["targets"].append(f"{node['hostname']}:{3000 + instance_id}")
-            sd["targets"].append(f"{node['hostname']}:9111")
+            sd2["targets"].append(f"{node['hostname']}:9111")
             instance_id += 1
 
-    json_string = json.dumps([sd])
+    json_string = json.dumps([sd, sd2])
     io.write_file(path, json_string)
     return
 
