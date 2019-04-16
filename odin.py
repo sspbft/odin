@@ -31,6 +31,8 @@ parser.add_argument("-ss", "--starting-state", help="path to " +
                     "start_state.json for state injection")
 parser.add_argument("-s", "--scale", help="number of virtual instances on " +
                     "each PL node", type=int, default=1)
+parser.add_argument("-rs", "--run-sleep", help="s to sleep in module.run")
+parser
 
 
 def setup_logging():
@@ -142,6 +144,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
     if args.git_branch:
         conf.set_application_git_branch(args.git_branch)
+    if args.run_sleep:
+        conf.set_run_sleep(args.run_sleep)
     mode = args.mode
 
     if args.mode == CLEANUP:
