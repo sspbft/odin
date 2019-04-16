@@ -53,8 +53,8 @@ def generate_heimdall_sd(nodes, scale_factor):
     for i, node in enumerate(nodes):
         instance_id = i * scale_factor
         for j in range(scale_factor):
-            sd["targets"].append(f"{node['hostname']}:{3000 + instance_id}")
-            sd2["targets"].append(f"{node['hostname']}:9111")
+            sd["targets"].append(f"{node['public_hostname']}:{3000 + instance_id}")
+            sd2["targets"].append(f"{node['public_hostname']}:9111")
             instance_id += 1
 
     json_string = json.dumps([sd, sd2])
@@ -83,26 +83,14 @@ def launch(args):
             nodes = [{"id": l.split(",")[0], "hostname": l.split(",")[1]}
                      for l in lines]
 
-    threads = []
-    for i, n in enumerate(nodes):
-        t = Thread(target=deploy_and_run, args=(n, i, args))
-        t.start()
-        threads.append(t)
-    
-    for t in threads:
-        t.join()
-
-    forever = Event()
-    forever.wait()
-
     regular_nodes = nodes[byz_count:]
     byz_nodes = nodes[:byz_count]
 
-    # if io.exists(conf.get_heimdall_sd_path()):
-    #     generate_heimdall_sd(byz_nodes + regular_nodes, args.scale)
+    if io.exists(conf.get_heimdall_sd_path()):
+        generate_heimdall_sd(byz_nodes + regular_nodes, args.scale)
 
-    # setup_heimdall()
-    # deploy(byz_nodes, regular_nodes, args)
+    setup_heimdall()
+    deploy(byz_nodes, regular_nodes, args)
 
 
 def cleanup():
@@ -158,20 +146,6 @@ if __name__ == "__main__":
 
     if args.mode == CLEANUP:
         cleanup()
-    # elif args.mode == FIND_HEALTHY:
-    #     find_healthy_nodes()
-    # stashed for now
-    # elif args.mode == ADD_ALL_NODES_TO_SLICE:
-    #     api.add_all_nodes_to_slice()
-    # elif args.mode == ADD_HEALTHY_NODES_TO_SLICE:
-    #     if not args.hosts_file:
-    #         logger.error(f"arg [hosts_file] is required")
-    #         sys.exit(1)
-    #     with open(args.hosts_file) as f:
-    #         node_ids = [int(l.rstrip().split(",")[0]) for l in f.readlines()]
-    #         api.set_nodes_for_slice(node_ids)
-    # elif args.mode == REMOVE_NODES_FROM_SLICE:
-    #     api.set_nodes_for_slice([], conf.get_slice())
     elif args.mode == DEPLOY:
         # register SIGINT handler
         signal.signal(signal.SIGINT, on_sig_term)

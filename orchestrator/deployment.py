@@ -13,9 +13,17 @@ def generate_hosts_file(nodes, scale_factor):
     with open("hosts.txt", "w") as f:
         for i, n in enumerate(nodes):
             instance_id = i * scale_factor
-            ip = socket.gethostbyname(n["hostname"])
+            ip = n["public_ip"]
             for j in range(scale_factor):
-                f.write(f"{instance_id},{n['hostname']},{ip}," +
+                f.write(f"{instance_id},{n['public_hostname']},{ip}," +
+                        f"{5000+instance_id}\n")
+                instance_id += 1
+    with open("priv_hosts.txt", "w") as f:
+        for i, n in enumerate(nodes):
+            instance_id = i * scale_factor
+            ip = n["private_ip"]
+            for j in range(scale_factor):
+                f.write(f"{instance_id},{n['private_hostname']},{ip}," +
                         f"{5000+instance_id}\n")
                 instance_id += 1
 
@@ -90,7 +98,7 @@ def deploy_node(node, starting_state_path):
     conn.transfer_files(
         hostname,
         [
-            io.get_abs_path("hosts.txt"),
+            io.get_abs_path("priv_hosts.txt"),
             io.get_abs_path(conf.get_bootstrap_script())
         ],
         target_dir
