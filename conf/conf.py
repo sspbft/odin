@@ -86,6 +86,10 @@ def get_app_run_sleep():
     return get(cs.ODIN_CONF, cs.APP_SECTION, cs.RUN_SLEEP)
 
 
+def set_run_sleep(rs):
+    odin_conf.set(cs.APP_SECTION, cs.RUN_SLEEP, rs)
+
+
 def get_slice():
     """Returns the configured slice."""
     return get(cs.ODIN_CONF, cs.PL_SECTION, cs.SLICE)
