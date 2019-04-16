@@ -42,13 +42,14 @@ install_node_exporter () {
 }
 
 log "Bootstrapping node"
+sudo yum install wget -y
 rm -rf ~/wget-log*
 
 log "Setting up PracticalBFT dir"
 sudo rm -r /practicalbft
 sudo mkdir /practicalbft
-sudo chown -R chalmersple_2018_10_29 /usr/src/
-sudo chown -R chalmersple_2018_10_29 /practicalbft/
+sudo chown -R $(whoami) /usr/src/
+sudo chown -R $(whoami) /practicalbft/
 cd /practicalbft
 
 if ! [ -x "$(command -v remote_syslog)" ]; then
@@ -64,8 +65,7 @@ else
 fi
 
 sudo nohup $(which remote_syslog) -c ~/log_files.yml >/dev/null 2>&1 &
-IP=$(curl ifconfig.me)
-nohup node_exporter --web.listen-address=$IP:9111 --collector.tcpstat >/dev/null 2>&1 &
+nohup node_exporter --web.listen-address=:9111 --collector.tcpstat >/dev/null 2>&1 &
 
 log "Installing dependencies and build tools"
 sudo yum install gcc openssl-devel bzip2-devel -y --nogpgcheck

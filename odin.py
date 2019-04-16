@@ -1,13 +1,15 @@
 from conf import conf
-from orchestrator.deployment import deploy
-from orchestrator.connector import run_command
-import api.pl as api
+from orchestrator.deployment import deploy, deploy_and_run
+from orchestrator.connector import run_command, transfer_files
+# import api.pl as api
+import api.aws as aws
 import logging
 import sys
 import subprocess
 import json
 import signal
 import helpers.io as io
+from threading import Thread, Event
 import helpers.ps as ps
 from shutil import which
 import argparse
@@ -62,13 +64,14 @@ def generate_heimdall_sd(nodes, scale_factor):
 
 def launch(args):
     """TODO write me."""
-    pl_slice = conf.get_slice()
+    # pl_slice = conf.get_slice()
     node_count = conf.get_number_of_nodes()
     byz_count = conf.get_number_of_byzantine()
 
     if not args.reuse_hosts:
-        logger.info("Fetching nodes for slice")
-        nodes = api.get_nodes_for_slice(pl_slice, node_count)
+        logger.info("Fetching nodes from aws")
+        # nodes = api.get_nodes_for_slice(pl_slice, node_count)
+        nodes = aws.get_ec2_instances(node_count)
     else:
         logger.info("Re-using nodes from hosts.txt")
         if not io.exists("hosts.txt"):
@@ -80,14 +83,26 @@ def launch(args):
             nodes = [{"id": l.split(",")[0], "hostname": l.split(",")[1]}
                      for l in lines]
 
+    threads = []
+    for i, n in enumerate(nodes):
+        t = Thread(target=deploy_and_run, args=(n, i, args))
+        t.start()
+        threads.append(t)
+    
+    for t in threads:
+        t.join()
+
+    forever = Event()
+    forever.wait()
+
     regular_nodes = nodes[byz_count:]
     byz_nodes = nodes[:byz_count]
 
-    if io.exists(conf.get_heimdall_sd_path()):
-        generate_heimdall_sd(byz_nodes + regular_nodes, args.scale)
+    # if io.exists(conf.get_heimdall_sd_path()):
+    #     generate_heimdall_sd(byz_nodes + regular_nodes, args.scale)
 
-    setup_heimdall()
-    deploy(byz_nodes, regular_nodes, args)
+    # setup_heimdall()
+    # deploy(byz_nodes, regular_nodes, args)
 
 
 def cleanup():

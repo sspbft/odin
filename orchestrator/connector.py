@@ -21,7 +21,7 @@ def transfer_files(hostname, files, target_dir, timeout=10):
     for f in files:
         cmd_string = (f"scp -o StrictHostKeyChecking=no -o UserKnownHosts" +
                       f"File=/dev/null -i {SSH_KEY_PATH} {f} " +
-                      f"{SLICE}@{hostname}:{target_dir}")
+                      f"ec2-user@{hostname}:{target_dir}")
         try:
             process = subprocess.Popen(cmd_string.split(), stdout=log_file,
                                        stderr=log_file)
@@ -41,7 +41,7 @@ def run_command(hostname, cmd, timeout=None):
     logger.debug(f"Running command {cmd} on {hostname}")
     log_file = get_log_file(hostname)
     cmd_string = (f"ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=" +
-                  f"/dev/null -l {SLICE} -i {SSH_KEY_PATH} {hostname} {cmd}")
+                  f"/dev/null -i {SSH_KEY_PATH} ec2-user@{hostname} {cmd}")
     process = subprocess.Popen(cmd_string.split(), stdout=log_file,
                                stderr=log_file)
     try:

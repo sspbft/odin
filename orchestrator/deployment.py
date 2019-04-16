@@ -66,7 +66,7 @@ def deploy_node(node, starting_state_path):
     logger.info(f"Deploying {app_folder} on branch {git_branch} to node " +
                 f"{hostname}")
 
-    conn.run_command(hostname, f"pkill -u {conf.get_slice()}")
+    conn.run_command(hostname, f"pkill -u ec2-user")
 
     logger.info(f"Transferring bootstrap files to {hostname}")
     # provision node
