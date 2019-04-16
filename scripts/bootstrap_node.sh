@@ -52,20 +52,25 @@ sudo chown -R $(whoami) /usr/src/
 sudo chown -R $(whoami) /practicalbft/
 cd /practicalbft
 
-if ! [ -x "$(command -v remote_syslog)" ]; then
+if ! [ -x "$(command -v /usr/local/sbin/remote_syslog)" ]; then
 	install_rsyslog
 else
 	log "remote_syslog already installed, skipping"
 fi
 
-if ! [ -x "$(command -v node_exporter)" ]; then
+if ! [ -x "$(command -v /usr/local/sbin/node_exporter)" ]; then
 	install_node_exporter
 else
 	log "node_exporter already installed, skipping"
 fi
 
-sudo nohup $(which remote_syslog) -c ~/log_files.yml >/dev/null 2>&1 &
-nohup node_exporter --web.listen-address=:9111 --collector.tcpstat >/dev/null 2>&1 &
+cd ~
+echo "LANG=en_US.utf-8" >> environment
+echo "LC_ALL=en_US.utf-8" >> environment
+sudo cp environment /etc/
+
+sudo nohup /usr/local/sbin/remote_syslog -c ~/log_files.yml &
+nohup /usr/local/sbin/node_exporter --web.listen-address=:9111 --collector.tcpstat &
 
 log "Installing dependencies and build tools"
 sudo yum install gcc openssl-devel bzip2-devel -y --nogpgcheck

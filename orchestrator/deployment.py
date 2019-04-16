@@ -47,20 +47,17 @@ def deploy(byz_nodes, regular_nodes, args):
 
     i = 0
     for n in byz_nodes + regular_nodes:
-        logger.info(f"Node {i} running on {n['hostname']}")
+        logger.info(f"Node {i} running on {n['public_hostname']}")
         i += 1
-
-    forever = Event()
-    forever.wait()
 
 
 def deploy_and_run(node, node_id, args):
     ret_code = deploy_node(node, args.starting_state)
     if ret_code != 0:
-        logger.error(f"Deployment to {node['hostname']} failed")
-    logger.info(f"Launching app on host {node['hostname']} with " +
+        logger.error(f"Deployment to {node['public_hostname']} failed")
+    logger.info(f"Launching app on host {node['public_hostname']} with " +
                 f"ID {node_id}")
-    launch_using_thor(node["hostname"], node_id, args)
+    launch_using_thor(node["public_hostname"], node_id, args)
     return
 
 
@@ -70,7 +67,7 @@ def deploy_node(node, starting_state_path):
     app_folder = conf.get_app_folder()
     target_dir = conf.get_target_dir()
     app_dir = f"{target_dir}/{app_folder}"
-    hostname = node["hostname"]
+    hostname = node["public_hostname"]
     logger.info(f"Deploying {app_folder} on branch {git_branch} to node " +
                 f"{hostname}")
 

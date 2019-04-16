@@ -88,7 +88,7 @@ def get_app_run_sleep():
 
 def get_slice():
     """Returns the configured slice."""
-    return get(cs.ODIN_CONF, cs.PL_SECTION, cs.SLICE)
+    return "ec2-user"
 
 
 def get_blacklisted_hosts():

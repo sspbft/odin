@@ -104,7 +104,7 @@ def cleanup():
 
 def on_sig_term(signal, frame):
     """TODO write me."""
-    logger.info("Quitting and killing all processes on PL nodes")
+    logger.info("Quitting and killing all processes on nodes")
     cleanup()
     ps.kill_all_subprocesses()
     sys.exit(0)

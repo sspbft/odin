@@ -77,7 +77,7 @@ def get_all_nodes():
 
 def is_node_healthy(node_details):
     """Health check for a PlanetLab node."""
-    hostname = node_details["hostname"]
+    hostname = node_details["public_hostname"]
     logger.info(f"Checking if {hostname} is healthy")
 
     # basic healthchecks

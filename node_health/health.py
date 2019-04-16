@@ -10,7 +10,7 @@ faulty_nodes = []
 
 
 def check_node(node):
-    hostname = node["hostname"]
+    hostname = node["public_hostname"]
     node_id = node["node_id"]
     logger.info(f"Checking node {hostname} to see if it is healthy")
     n_str = f"{node_id},{hostname}"
