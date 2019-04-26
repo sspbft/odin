@@ -65,6 +65,7 @@ else
 fi
 
 cd ~
+rm environment
 echo "LANG=en_US.utf-8" >> environment
 echo "LC_ALL=en_US.utf-8" >> environment
 sudo cp environment /etc/
