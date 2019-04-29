@@ -74,6 +74,8 @@ def launch(args):
         logger.info("Fetching nodes from aws")
         # nodes = api.get_nodes_for_slice(pl_slice, node_count)
         nodes = aws.get_ec2_instances(node_count)
+        if len(nodes) < node_count:
+            raise ValueError(f"Found {len(nodes)}/{node_count} nodes, aborting")
     else:
         logger.info("Re-using nodes from hosts.txt")
         if not io.exists("hosts.txt"):
