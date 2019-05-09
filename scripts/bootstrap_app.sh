@@ -1,4 +1,4 @@
-# ntoe that this is the bootstrap script for BFTList and not a generic script
+# note that this is the bootstrap script for BFTList and not a generic script
 cp /practicalbft/hosts.txt conf/hosts.txt
 python3.7 -m venv env
 source ./env/bin/activate

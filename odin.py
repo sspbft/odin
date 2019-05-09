@@ -30,6 +30,7 @@ parser.add_argument("-ss", "--starting-state", help="path to " +
 parser.add_argument("-s", "--scale", help="number of virtual instances on " +
                     "each PL node", type=int, default=1)
 parser.add_argument("-rs", "--run-sleep", help="s to sleep in module.run")
+parser.add_argument("-c", "--clients", help="number of clients", type=int)
 parser
 
 

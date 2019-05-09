@@ -125,11 +125,12 @@ def launch_using_thor(hostname, i, args):
     lp = f"{conf.get_target_dir()}/application.log"
     rs = conf.get_app_run_sleep()
     s = args.scale
+    c = args.clients
     nss_flag = " -nss " if args.non_selfstab else " "
     ss_flag = " -ss " if args.starting_state else " "
     cmd_string = (f"cd {thor_dir} && source ./env/bin/activate && " +
                   f"python thor.py -n {n} -f {f} -p {p} -e '{e}' " +
-                  f"-i {i} -lp {lp} -rs {rs} -s {s}" +
+                  f"-i {i} -lp {lp} -rs {rs} -s {s} -c {c}" +
                   f"{nss_flag}{ss_flag}planetlab &")
     logging.info(f"Launching Thor with cmd: {cmd_string} on {hostname}")
     return conn.run_command(hostname, cmd_string)
