@@ -6,7 +6,7 @@
 pkill -f nc
 
 # check for Internet access
-wget -q --tries=10 --timeout=20 --spider https://media.inneva.se/inneva.png > /dev/null
+wget -q --tries=10 --timeout=20 --spider https://images.ctfassets.net/2o3iq74rr1u2/6moBdVe2UwG0Fua6LTDQ6m/78cf10a8560cec2eb1009589ba6536f6/axel_profile_resized.jpg > /dev/null
 if [[ $? -eq 0 ]]; then
         echo "Host appears to be online"
 else
