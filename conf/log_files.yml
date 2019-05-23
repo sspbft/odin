@@ -1,5 +1,5 @@
 files: 
-  - /practicalbft/application.log
+  - /sspbft/application.log
   - ~/bootstrap.log
 destination:
   host: logs6.papertrailapp.com

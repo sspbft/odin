@@ -45,11 +45,11 @@ log "Bootstrapping node"
 rm -rf ~/wget-log*
 
 log "Setting up PracticalBFT dir"
-sudo rm -r /practicalbft
-sudo mkdir /practicalbft
+sudo rm -r /sspbft
+sudo mkdir /sspbft
 sudo chown -R chalmersple_2018_10_29 /usr/src/
-sudo chown -R chalmersple_2018_10_29 /practicalbft/
-cd /practicalbft
+sudo chown -R chalmersple_2018_10_29 /sspbft/
+cd /sspbft
 
 if ! [ -x "$(command -v remote_syslog)" ]; then
 	install_rsyslog
@@ -104,8 +104,8 @@ else
 fi
 
 log "Fetching Thor"
-cd /practicalbft
-git clone https://github.com/practicalbft/thor.git
+cd /sspbft
+git clone https://github.com/sspbft/thor.git
 cd thor
 python3.7 -m venv env
 source ./env/bin/activate
@@ -115,8 +115,8 @@ deactivate
 log "Thor installed and bootstrapped"
 
 log "Fetching BFTList-client"
-cd /practicalbft
-git clone https://github.com/practicalbft/BFTList-client.git
+cd /sspbft
+git clone https://github.com/sspbft/BFTList-client.git
 cd BFTList-client
 python3.7 -m venv env
 source ./env/bin/activate

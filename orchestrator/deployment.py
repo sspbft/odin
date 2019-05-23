@@ -112,7 +112,7 @@ def deploy_node(node, starting_state_path):
         conn.transfer_files(
             hostname,
             [io.get_abs_path(starting_state_path)],
-            "/practicalbft/BFTList/conf"
+            "/sspbft/BFTList/conf"
         )
 
 

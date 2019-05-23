@@ -1,12 +1,12 @@
 # Odin
 Orchestrator service used to manage nodes and deployment of code on PlanetLab. Named after the god of gods, Odin.
-[![Build status](https://travis-ci.org/practicalbft/odin.svg?branch=master)](https://travis-ci.org/travis-ci/travis-web)
+[![Build status](https://travis-ci.org/sspbft/odin.svg?branch=master)](https://travis-ci.org/travis-ci/travis-web)
 
 
 ## About Odin
 ## Set up
 ```
-git clone https://github.com/practicalbft/odin.git && cd odin
+git clone https://github.com/sspbft/odin.git && cd odin
 python3.7 -m venv env
 source ./env/bin/activate
 pip install --upgrade pip
