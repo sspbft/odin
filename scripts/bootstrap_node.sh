@@ -1,5 +1,5 @@
 #/bin/bash
-# bootstraps a PlanetLab node for PracticalBFT usage
+# bootstraps a PlanetLab node for SSPBFT usage
 
 BLUE='\033[1;34m'
 NO_COLOR='\033[0m'
@@ -44,7 +44,7 @@ install_node_exporter () {
 log "Bootstrapping node"
 rm -rf ~/wget-log*
 
-log "Setting up PracticalBFT dir"
+log "Setting up SSPBFT dir"
 sudo rm -r /sspbft
 sudo mkdir /sspbft
 sudo chown -R chalmersple_2018_10_29 /usr/src/
