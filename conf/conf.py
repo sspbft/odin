@@ -102,7 +102,7 @@ def get_blacklisted_hosts():
 
 def get_heimdall_sd_path():
     """Returns the absolute path to the Heimdall SD file."""
-    return get(cs.ODIN_CONF, cs.ETC_SECTION, cs.HEIMDALL_SD_PATH)
+    return f"{get_heimdall_root()}/prometheus/sd.json"
 
 
 def get_heimdall_root():

@@ -30,7 +30,8 @@ parser.add_argument("-ss", "--starting-state", help="path to " +
 parser.add_argument("-s", "--scale", help="number of virtual instances on " +
                     "each PL node", type=int, default=1)
 parser.add_argument("-rs", "--run-sleep", help="s to sleep in module.run")
-parser.add_argument("-c", "--clients", help="number of clients", type=int)
+parser.add_argument("-c", "--clients", help="number of clients", type=int,
+                    default=6)
 
 
 def setup_logging():
@@ -143,26 +144,10 @@ if __name__ == "__main__":
         conf.set_application_git_branch(args.git_branch)
     if args.run_sleep:
         conf.set_run_sleep(args.run_sleep)
-    if args.clients is None:
-        raise ValueError("Flag -c|--clients must be present")
     mode = args.mode
 
     if args.mode == CLEANUP:
         cleanup()
-    # elif args.mode == FIND_HEALTHY:
-    #     find_healthy_nodes()
-    # stashed for now
-    # elif args.mode == ADD_ALL_NODES_TO_SLICE:
-    #     api.add_all_nodes_to_slice()
-    # elif args.mode == ADD_HEALTHY_NODES_TO_SLICE:
-    #     if not args.hosts_file:
-    #         logger.error(f"arg [hosts_file] is required")
-    #         sys.exit(1)
-    #     with open(args.hosts_file) as f:
-    #         node_ids = [int(l.rstrip().split(",")[0]) for l in f.readlines()]
-    #         api.set_nodes_for_slice(node_ids)
-    # elif args.mode == REMOVE_NODES_FROM_SLICE:
-    #     api.set_nodes_for_slice([], conf.get_slice())
     elif args.mode == DEPLOY:
         # register SIGINT handler
         signal.signal(signal.SIGINT, on_sig_term)
