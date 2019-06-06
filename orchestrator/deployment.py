@@ -1,3 +1,4 @@
+"""Various functions related to the deployment of an SSPBFT app to PL."""
 from conf import conf
 from helpers import io
 from threading import Thread, Event
@@ -10,6 +11,7 @@ SLICE = conf.get_slice()
 
 
 def generate_hosts_file(nodes, scale_factor):
+    """Generates a hosts file to be used in the deployment."""
     with open("hosts.txt", "w") as f:
         for i, n in enumerate(nodes):
             instance_id = i * scale_factor
@@ -21,6 +23,7 @@ def generate_hosts_file(nodes, scale_factor):
 
 
 def deploy(byz_nodes, regular_nodes, args):
+    """Launches the deployment threads."""
     if not args.reuse_hosts:
         generate_hosts_file(byz_nodes + regular_nodes, args.scale)
 
@@ -47,6 +50,7 @@ def deploy(byz_nodes, regular_nodes, args):
 
 
 def deploy_and_run(node, node_id, args):
+    """Wrapper around deploying the code to a node."""
     ret_code = deploy_node(node, args.starting_state)
     if ret_code != 0:
         logger.error(f"Deployment to {node['hostname']} failed")
@@ -57,6 +61,7 @@ def deploy_and_run(node, node_id, args):
 
 
 def deploy_node(node, starting_state_path):
+    """Performs the actual deployment."""
     git_url = conf.get_application_git_url()
     git_branch = conf.get_application_git_branch()
     app_folder = conf.get_app_folder()
@@ -117,6 +122,7 @@ def deploy_node(node, starting_state_path):
 
 
 def launch_using_thor(hostname, i, args):
+    """Launches Thor on a given host, which in turn spins up the app."""
     thor_dir = f"{conf.get_target_dir()}/thor"
     n = conf.get_number_of_nodes() * args.scale
     f = conf.get_number_of_byzantine() * args.scale

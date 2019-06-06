@@ -1,7 +1,10 @@
+"""Module containing PlanetLab auth code."""
+
 from conf import conf
 
 
 def get_auth():
+    """Returns auth object used when connecting to a PlanetLab host."""
     username = conf.get_pl_username()
     password = conf.get_pl_password()
 

@@ -1,3 +1,5 @@
+"""Contains constants used throughout this project."""
+
 # Conf
 AUTH_CONF = "auth.ini"
 ODIN_CONF = "odin.ini"

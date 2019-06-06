@@ -1,3 +1,5 @@
+"""Main entrypoint script for Odin CLI."""
+
 from conf import conf
 from orchestrator.deployment import deploy
 from orchestrator.connector import run_command
@@ -42,13 +44,15 @@ def setup_logging():
 
 
 def generate_heimdall_sd(nodes, scale_factor):
-    """
+    """Generate Heimdall SD file
+
     Generates the service discovery file used by the Prometheus container
     in Heimdall.
     """
     path = conf.get_heimdall_sd_path()
     sd = {"targets": [], "labels": {"mode": "planetlab", "job": "bft-list"}}
-    sd2 = {"targets": [], "labels": {"mode": "planetlab", "job": "node-exporter"}}
+    sd2 = {"targets": [], "labels": {"mode": "planetlab",
+           "job": "node-exporter"}}
 
     # add all instances on Docker host to targets (only in local mode)
     for i, node in enumerate(nodes):
@@ -64,7 +68,7 @@ def generate_heimdall_sd(nodes, scale_factor):
 
 
 def launch(args):
-    """TODO write me."""
+    """Main entrypoint of Odin CLI"""
     pl_slice = conf.get_slice()
     node_count = conf.get_number_of_nodes()
     byz_count = conf.get_number_of_byzantine()
@@ -94,7 +98,7 @@ def launch(args):
 
 
 def cleanup():
-    """TODO write me."""
+    """Helper function that kills all processes started by on PL hosts."""
     user = conf.get_slice()
     with open("hosts.txt") as f:
         for l in f.readlines():
@@ -103,7 +107,7 @@ def cleanup():
 
 
 def on_sig_term(signal, frame):
-    """TODO write me."""
+    """SIGTERM interrup handler that kills a deployment"""
     logger.info("Quitting and killing all processes on PL nodes")
     cleanup()
     ps.kill_all_subprocesses()

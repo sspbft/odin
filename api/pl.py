@@ -1,3 +1,5 @@
+"""Wrapper around PlanetLab API."""
+
 from api.auth import get_auth
 from conf import conf
 from helpers import io
@@ -18,6 +20,7 @@ logger = logging.getLogger(__name__)
 
 
 def get_node_ids_for_slice(slice_name):
+    """Returns the IDs of all nodes attached to {slice_name}."""
     logger.info(f"Querying PL API for nodes attached to slice {slice_name}")
     slices = api_server.GetSlices(auth, slice_name)
     if len(slices) == 0:
@@ -27,6 +30,7 @@ def get_node_ids_for_slice(slice_name):
 
 
 def get_nodes_for_slice(slice_name, count):
+    """Returns details for {count} nodes attached to slice {slice_name}."""
     logger.info(f"Fetching nodes attached to {slice_name}")
     node_ids = get_node_ids_for_slice(slice_name)
     if len(node_ids) < count:
@@ -62,6 +66,7 @@ def get_nodes_for_slice(slice_name, count):
 
 
 def get_node_details(node_id):
+    """Returns details for node with id {node_id}."""
     logger.info(f"Querying PL API for details of node {node_id}")
     nodes = api_server.GetNodes(auth, node_id)
     if len(nodes) == 0:
@@ -71,7 +76,7 @@ def get_node_details(node_id):
 
 
 def get_all_nodes():
-    logger.info("Checking ALL nodes on PlanetLab to see which are healthy")
+    """Returns all nodes available on PlanetLab."""
     return api_server.GetNodes(auth)
 
 
@@ -139,13 +144,12 @@ def is_node_healthy(node_details):
 def node_responds_within_threshold(hostname):
     """Checks if the node can run a simple command within threshold s."""
     logger.info(f"Checking if {hostname} responds within threshold")
-    return True
-    # start_time = time.time()
-    # conn.run_command(hostname, "ls /", timeout=15)
-    # responding_within_threshold = time.time() - start_time < NODE_CMD_THRESHOLD
-    # if not responding_within_threshold:
-    #     logger.warning(f"{hostname} is not responding within threshold")
-    # return responding_within_threshold
+    start_time = time.time()
+    conn.run_command(hostname, "ls /", timeout=15)
+    responding_within_threshold = time.time() - start_time < NODE_CMD_THRESHOLD
+    if not responding_within_threshold:
+        logger.warning(f"{hostname} is not responding within threshold")
+    return responding_within_threshold
 
 
 def is_online(hostname):
@@ -167,7 +171,8 @@ def responding_to_ping(hostname):
 
 
 def set_nodes_for_slice(nodes, slice_name=conf.get_slice()):
-    api_server.UpdateSlice(auth, slice_name, {"nodes": nodes})
+    """Attaches the nodes {nodes} to {slice_name}."""
+    api_server.UpdateSlice(auth, slice_name, {"n.odes": nodes})
     logger.info(f"Set nodes {nodes} for slice {slice_name}")
 
 

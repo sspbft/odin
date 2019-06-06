@@ -1,4 +1,4 @@
-
+"""Helpers for getting the configuration options set in the ini files."""
 from configparser import ConfigParser
 import helpers.constants as cs
 
@@ -87,6 +87,7 @@ def get_app_run_sleep():
 
 
 def set_run_sleep(rs):
+    """Sets the run sleep for the modules."""
     odin_conf.set(cs.APP_SECTION, cs.RUN_SLEEP, rs)
 
 

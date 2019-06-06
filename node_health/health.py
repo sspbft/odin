@@ -1,3 +1,5 @@
+"""Functions related to PlanetLab node health"""
+
 from threading import Thread
 from conf import conf
 import api.pl as api
@@ -10,6 +12,7 @@ faulty_nodes = []
 
 
 def check_node(node):
+    """Checks a node to see if it is healthy."""
     hostname = node["hostname"]
     node_id = node["node_id"]
     logger.info(f"Checking node {hostname} to see if it is healthy")
@@ -21,6 +24,7 @@ def check_node(node):
 
 
 def find_healthy_nodes():
+    """Helper function that can be used to find healthy nodes on PlanetLab."""
     slc = conf.get_slice()
     old_nodes = api.get_node_ids_for_slice(slc)
     logger.info(f"Old nodes for {slc}: {old_nodes}")

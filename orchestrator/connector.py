@@ -1,3 +1,4 @@
+"""This module contains code related to connecting to/executing on hosts."""
 from conf import conf
 from helpers import io
 import logging
@@ -9,12 +10,14 @@ SLICE = conf.get_slice()
 
 
 def get_log_file(hostname):
+    """Returns the local log file for a given hostname."""
     if not io.exists("./etc/logs"):
         io.create_dir("./etc/logs")
     return open(f"./etc/logs/{hostname}.log", "a")
 
 
 def transfer_files(hostname, files, target_dir, timeout=10):
+    """Transfers a list of files to a host."""
     logger.debug(f"Transferring files {files} to {hostname}:{target_dir}")
     log_file = get_log_file(hostname)
 
@@ -38,6 +41,7 @@ def transfer_files(hostname, files, target_dir, timeout=10):
 
 
 def run_command(hostname, cmd, timeout=None):
+    """Runs a command on a host."""
     logger.debug(f"Running command {cmd} on {hostname}")
     log_file = get_log_file(hostname)
     cmd_string = (f"ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=" +
