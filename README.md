@@ -1,6 +1,7 @@
 # Odin
-Orchestrator service used to manage nodes and deployment of code on PlanetLab. Named after the god of gods, Odin.
 [![Build status](https://travis-ci.org/sspbft/odin.svg?branch=master)](https://travis-ci.org/travis-ci/travis-web)
+
+Orchestrator service used to manage nodes and deployment of code on PlanetLab. Named after the god of gods, Odin.
 
 
 ## About Odin
