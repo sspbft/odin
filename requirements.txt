@@ -11,4 +11,4 @@ pyflakes==2.1.1
 requests==2.21.0
 six==1.12.0
 snowballstemmer==1.2.1
-urllib3==1.24.1
+urllib3==1.24.2
