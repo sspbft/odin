@@ -50,7 +50,8 @@ def generate_heimdall_sd(nodes, scale_factor):
     in Heimdall.
     """
     path = conf.get_heimdall_sd_path()
-    sd = {"targets": [], "labels": {"mode": "planetlab", "job": "bft-list"}}
+    app_folder = conf.get_app_folder()
+    sd = {"targets": [], "labels": {"mode": "planetlab", "job": app_folder }}
     sd2 = {"targets": [], "labels": {"mode": "planetlab",
            "job": "node-exporter"}}
 
