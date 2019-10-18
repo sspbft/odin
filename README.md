@@ -1,3 +1,6 @@
+# DEPRECATED
+Please use [plcli](https://github.com/axelniklasson/plcli) instead!
+
 # Odin
 [![Build status](https://travis-ci.org/sspbft/odin.svg?branch=master)](https://travis-ci.org/travis-ci/travis-web)
 
